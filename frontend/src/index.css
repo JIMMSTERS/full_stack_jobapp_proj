@@ -123,3 +123,60 @@ button.link {
   border-radius: 6px;
   margin-bottom: 1rem;
 }
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.user-name {
+  color: #334155;
+  font-weight: 500;
+}
+
+.logout-button {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background: #e2e8f0;
+}
+
+.login {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.login-button {
+  display: inline-block;
+  background: #2563eb;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.login-button:hover {
+  background: #1d4ed8;
+}

@@ -48,3 +48,13 @@ def test_delete_application(client):
 
 def test_get_missing_application_returns_404(client):
     assert client.get("/applications/9999").status_code == 404
+
+
+def test_requires_authentication(unauthenticated_client):
+    assert unauthenticated_client.get("/applications").status_code == 401
+    assert (
+        unauthenticated_client.post(
+            "/applications", json={"company": "Acme", "position": "SWE"}
+        ).status_code
+        == 401
+    )

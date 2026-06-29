@@ -37,3 +37,14 @@ class Application(ApplicationBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
+
+class User(BaseModel):
+    """A logged-in user as returned by the API."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    email: str
+    name: str | None = None
+    picture: str | None = None

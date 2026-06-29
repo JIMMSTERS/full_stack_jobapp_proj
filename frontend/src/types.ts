@@ -24,6 +24,13 @@ export interface ApplicationCreate {
   notes?: string | null;
 }
 
+export interface User {
+  id: number;
+  email: string;
+  name: string | null;
+  picture: string | null;
+}
+
 export const STATUSES = [
   "applied",
   "screening",
