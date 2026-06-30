@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app import gmail, models
+from app import classifier, gmail, models
 from app.auth import get_current_user
 from app.database import get_db
 
@@ -15,9 +15,10 @@ def list_messages(
     db=Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    """Return the current user's recent inbox messages."""
+    """Return the current user's recent inbox messages, each tagged by the
+    classifier with whether it's job-related and any detected status."""
     try:
-        return gmail.list_recent_messages(db, current_user, max_results=limit)
+        messages = gmail.list_recent_messages(db, current_user, max_results=limit)
     except gmail.GmailNotConnected:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -28,3 +29,11 @@ def list_messages(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=str(exc),
         )
+
+    for message in messages:
+        message["classification"] = classifier.classify(
+            subject=message.get("subject", ""),
+            sender=message.get("from", ""),
+            snippet=message.get("snippet", ""),
+        )
+    return messages

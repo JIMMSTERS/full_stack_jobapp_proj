@@ -2,11 +2,27 @@ import { useState } from "react";
 import { fetchGmailMessages } from "../api";
 import type { GmailMessage } from "../types";
 
+function formatDate(raw: string): string {
+  if (!raw) return "";
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return raw;
+  const now = new Date();
+  const sameYear = d.getFullYear() === now.getFullYear();
+  return d.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    ...(sameYear ? {} : { year: "numeric" }),
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 export function GmailPanel() {
   const [messages, setMessages] = useState<GmailMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [jobsOnly, setJobsOnly] = useState(false);
 
   async function handleFetch() {
     setLoading(true);
@@ -21,6 +37,11 @@ export function GmailPanel() {
     }
   }
 
+  const jobCount = messages.filter((m) => m.classification.is_job_related).length;
+  const visible = jobsOnly
+    ? messages.filter((m) => m.classification.is_job_related)
+    : messages;
+
   return (
     <section className="gmail-panel">
       <div className="gmail-header">
@@ -32,19 +53,69 @@ export function GmailPanel() {
 
       {error && <div className="error">{error}</div>}
 
+      {loaded && messages.length > 0 && (
+        <div className="gmail-toolbar">
+          <span className="gmail-count">
+            {jobCount} of {messages.length} look job-related
+          </span>
+          <label className="gmail-filter">
+            <input
+              type="checkbox"
+              checked={jobsOnly}
+              onChange={(e) => setJobsOnly(e.target.checked)}
+            />
+            Job-related only
+          </label>
+        </div>
+      )}
+
       {loaded && messages.length === 0 && !error && (
         <p className="empty">No messages found.</p>
       )}
 
-      {messages.length > 0 && (
+      {visible.length > 0 && (
         <ul className="gmail-list">
-          {messages.map((m) => (
-            <li key={m.id} className="gmail-item">
-              <div className="gmail-subject">{m.subject || "(no subject)"}</div>
-              <div className="gmail-meta">{m.from}</div>
-              <div className="gmail-snippet">{m.snippet}</div>
-            </li>
-          ))}
+          {visible.map((m) => {
+            const c = m.classification;
+            return (
+              <li
+                key={m.id}
+                className={`gmail-item${c.is_job_related ? " is-job" : ""}`}
+              >
+                <a
+                  className="gmail-link"
+                  href={`https://mail.google.com/mail/u/0/#all/${m.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Open in Gmail"
+                >
+                  <div className="gmail-subject">
+                    {m.subject || "(no subject)"}
+                    {c.is_job_related && (
+                      <span className="badge badge-job">job</span>
+                    )}
+                    {c.detected_status && (
+                      <span
+                        className={`badge badge-status status-${c.detected_status}`}
+                      >
+                        {c.detected_status}
+                      </span>
+                    )}
+                  </div>
+                  <div className="gmail-meta">
+                    {m.from}
+                    {c.company_guess && (
+                      <span className="gmail-company"> · {c.company_guess}</span>
+                    )}
+                    {m.date && (
+                      <span className="gmail-date"> · {formatDate(m.date)}</span>
+                    )}
+                  </div>
+                  <div className="gmail-snippet">{m.snippet}</div>
+                </a>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>

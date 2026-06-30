@@ -31,12 +31,19 @@ export interface User {
   picture: string | null;
 }
 
+export interface EmailClassification {
+  is_job_related: boolean;
+  detected_status: string | null;
+  company_guess: string | null;
+}
+
 export interface GmailMessage {
   id: string;
   subject: string;
   from: string;
   date: string;
   snippet: string;
+  classification: EmailClassification;
 }
 
 export const STATUSES = [
