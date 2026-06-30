@@ -11,6 +11,7 @@ import {
 import type { Application, ApplicationCreate, User } from "./types";
 import { ApplicationForm } from "./components/ApplicationForm";
 import { ApplicationTable } from "./components/ApplicationTable";
+import { GmailPanel } from "./components/GmailPanel";
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -129,6 +130,8 @@ export default function App() {
           onUpdate={handleUpdate}
         />
       )}
+
+      <GmailPanel />
     </div>
   );
 }

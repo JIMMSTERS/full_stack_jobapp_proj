@@ -20,6 +20,12 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     picture: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    # Google OAuth tokens used to call Gmail on the user's behalf.
+    google_access_token: Mapped[str | None] = mapped_column(Text, nullable=True)
+    google_refresh_token: Mapped[str | None] = mapped_column(Text, nullable=True)
+    google_token_expiry: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

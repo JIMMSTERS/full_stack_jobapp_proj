@@ -180,3 +180,53 @@ button.link {
 .login-button:hover {
   background: #1d4ed8;
 }
+
+.gmail-panel {
+  margin-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.25rem;
+}
+
+.gmail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.gmail-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.gmail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.gmail-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  background: #fff;
+}
+
+.gmail-subject {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.gmail-meta {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0.15rem 0;
+}
+
+.gmail-snippet {
+  font-size: 0.85rem;
+  color: #475569;
+}

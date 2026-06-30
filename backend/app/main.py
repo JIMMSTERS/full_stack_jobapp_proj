@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from app import config
-from app.routes import applications, auth
+from app.routes import applications, auth, gmail
 
 # CORS origins allowed to call this API (React dev server).
 ALLOWED_ORIGINS = [
@@ -37,6 +37,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(applications.router)
+app.include_router(gmail.router)
 
 
 @app.get("/")

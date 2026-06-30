@@ -31,6 +31,14 @@ export interface User {
   picture: string | null;
 }
 
+export interface GmailMessage {
+  id: string;
+  subject: string;
+  from: string;
+  date: string;
+  snippet: string;
+}
+
 export const STATUSES = [
   "applied",
   "screening",

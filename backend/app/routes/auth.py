@@ -18,7 +18,11 @@ CALLBACK_PATH = "/auth/callback"
 async def login(request: Request):
     """Start the OAuth flow by redirecting the user to Google."""
     redirect_uri = str(request.url_for("auth_callback"))
-    return await auth.oauth.google.authorize_redirect(request, redirect_uri)
+    # access_type=offline + prompt=consent ensure Google returns a refresh token
+    # so we can read Gmail later without the user being present.
+    return await auth.oauth.google.authorize_redirect(
+        request, redirect_uri, access_type="offline", prompt="consent"
+    )
 
 
 @router.get("/callback", name="auth_callback")
@@ -38,6 +42,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
         )
 
     user = auth.upsert_user(db, claims)
+    auth.save_google_tokens(db, user, token)
     session = auth.create_session(db, user)
 
     response = RedirectResponse(url=config.FRONTEND_URL)

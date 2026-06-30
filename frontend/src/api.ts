@@ -1,4 +1,4 @@
-import type { Application, ApplicationCreate, User } from "./types";
+import type { Application, ApplicationCreate, GmailMessage, User } from "./types";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000";
 
@@ -65,4 +65,10 @@ export async function deleteApplication(id: number): Promise<void> {
     ...withCredentials,
   });
   if (!res.ok) throw new Error(`API ${res.status}`);
+}
+
+export async function fetchGmailMessages(limit = 20): Promise<GmailMessage[]> {
+  return handle(
+    await fetch(`${BASE_URL}/gmail/messages?limit=${limit}`, withCredentials)
+  );
 }

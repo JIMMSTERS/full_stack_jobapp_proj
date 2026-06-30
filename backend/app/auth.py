@@ -10,6 +10,9 @@ from sqlalchemy.orm import Session
 from app import config, models
 from app.database import get_db
 
+# OAuth scopes we request. gmail.readonly lets us read (not modify) the inbox.
+GOOGLE_SCOPES = "openid email profile https://www.googleapis.com/auth/gmail.readonly"
+
 # Authlib OAuth registry. Google's discovery document supplies all endpoints.
 oauth = OAuth()
 oauth.register(
@@ -17,8 +20,21 @@ oauth.register(
     client_id=config.GOOGLE_CLIENT_ID,
     client_secret=config.GOOGLE_CLIENT_SECRET,
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-    client_kwargs={"scope": "openid email profile"},
+    client_kwargs={"scope": GOOGLE_SCOPES},
 )
+
+
+def save_google_tokens(db: Session, user: models.User, token: dict) -> None:
+    """Persist the Google access/refresh tokens from an OAuth token response."""
+    user.google_access_token = token.get("access_token")
+    # Google only returns a refresh_token on the first consent; keep the old one
+    # if this response doesn't include a new one.
+    if token.get("refresh_token"):
+        user.google_refresh_token = token["refresh_token"]
+    expires_at = token.get("expires_at")
+    if expires_at:
+        user.google_token_expiry = datetime.fromtimestamp(expires_at, tz=timezone.utc)
+    db.commit()
 
 
 def upsert_user(db: Session, claims: dict) -> models.User:
