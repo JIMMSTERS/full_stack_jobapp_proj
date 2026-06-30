@@ -48,6 +48,17 @@ class ImportSummary(BaseModel):
     unchanged: int
 
 
+class StatusEvent(BaseModel):
+    """A single entry in an application's activity timeline."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    from_status: str | None = None
+    to_status: str
+    created_at: datetime
+
+
 class WeeklyPoint(BaseModel):
     """Number of applications created in the week starting ``week`` (ISO date)."""
 

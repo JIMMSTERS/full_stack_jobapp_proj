@@ -53,6 +53,19 @@ def get_application(
     return application
 
 
+@router.get("/{application_id}/events", response_model=list[schemas.StatusEvent])
+def get_application_events(
+    application_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Return the activity timeline for an application owned by the current user."""
+    application = crud.get_application(db, application_id, current_user.id)
+    if application is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application not found")
+    return crud.get_application_events(db, application_id)
+
+
 @router.patch("/{application_id}", response_model=schemas.Application)
 def update_application(
     application_id: int,

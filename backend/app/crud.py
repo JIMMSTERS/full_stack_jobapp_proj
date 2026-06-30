@@ -61,6 +61,14 @@ def create_application(
     """Insert a new application owned by the user."""
     db_application = models.Application(**application.model_dump(), user_id=user_id)
     db.add(db_application)
+    db.flush()
+    db.add(
+        models.StatusEvent(
+            application_id=db_application.id,
+            from_status=None,
+            to_status=db_application.status,
+        )
+    )
     db.commit()
     db.refresh(db_application)
     return db_application
@@ -84,6 +92,14 @@ def create_imported_application(
         gmail_thread_id=gmail_thread_id,
     )
     db.add(db_application)
+    db.flush()
+    db.add(
+        models.StatusEvent(
+            application_id=db_application.id,
+            from_status=None,
+            to_status=status,
+        )
+    )
     db.commit()
     db.refresh(db_application)
     return db_application
@@ -92,12 +108,39 @@ def create_imported_application(
 def update_application(
     db: Session, db_application: models.Application, updates: schemas.ApplicationUpdate
 ) -> models.Application:
-    """Apply partial updates to an existing application."""
-    for field, value in updates.model_dump(exclude_unset=True).items():
+    """Apply partial updates to an existing application.
+
+    When the ``status`` changes, append a row to the activity timeline so the
+    transition is recorded.
+    """
+    previous_status = db_application.status
+    changes = updates.model_dump(exclude_unset=True)
+    for field, value in changes.items():
         setattr(db_application, field, value)
+    new_status = db_application.status
+    if "status" in changes and new_status != previous_status:
+        db.add(
+            models.StatusEvent(
+                application_id=db_application.id,
+                from_status=previous_status,
+                to_status=new_status,
+            )
+        )
     db.commit()
     db.refresh(db_application)
     return db_application
+
+
+def get_application_events(
+    db: Session, application_id: int
+) -> list[models.StatusEvent]:
+    """Return an application's timeline entries, oldest first."""
+    return (
+        db.query(models.StatusEvent)
+        .filter(models.StatusEvent.application_id == application_id)
+        .order_by(models.StatusEvent.created_at, models.StatusEvent.id)
+        .all()
+    )
 
 
 def delete_application(db: Session, db_application: models.Application) -> None:

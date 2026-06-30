@@ -91,3 +91,30 @@ class Application(Base):
     )
 
     user: Mapped["User"] = relationship(back_populates="applications")
+    events: Mapped[list["StatusEvent"]] = relationship(
+        back_populates="application",
+        cascade="all, delete-orphan",
+        order_by="StatusEvent.created_at",
+    )
+
+
+class StatusEvent(Base):
+    """A single entry in an application's activity timeline.
+
+    One row is created when an application first appears (``from_status`` is
+    ``None``) and one each time its status changes thereafter.
+    """
+
+    __tablename__ = "status_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    application_id: Mapped[int] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    from_status: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    to_status: Mapped[str] = mapped_column(String(50), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    application: Mapped["Application"] = relationship(back_populates="events")

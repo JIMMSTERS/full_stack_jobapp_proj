@@ -25,6 +25,13 @@ export interface ApplicationCreate {
   notes?: string | null;
 }
 
+export interface StatusEvent {
+  id: number;
+  from_status: string | null;
+  to_status: string;
+  created_at: string;
+}
+
 export interface User {
   id: number;
   email: string;

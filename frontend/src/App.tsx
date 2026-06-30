@@ -15,6 +15,7 @@ import { ApplicationForm } from "./components/ApplicationForm";
 import { ApplicationTable } from "./components/ApplicationTable";
 import { CommandPalette } from "./components/CommandPalette";
 import { Dashboard } from "./components/Dashboard";
+import { DetailDrawer } from "./components/DetailDrawer";
 import { GmailPanel } from "./components/GmailPanel";
 import { KanbanBoard } from "./components/KanbanBoard";
 
@@ -52,6 +53,10 @@ export default function App() {
   const [highlightId, setHighlightId] = useState<number | null>(null);
   const [view, setView] = useState<View>("table");
   const [theme, setTheme] = useState<ThemeId>(getInitialTheme);
+  const [detailId, setDetailId] = useState<number | null>(null);
+
+  const detailApp =
+    detailId == null ? null : applications.find((a) => a.id === detailId) ?? null;
 
   async function refresh() {
     try {
@@ -113,6 +118,7 @@ export default function App() {
   async function handleDelete(id: number) {
     const removed = applications.find((a) => a.id === id);
     await deleteApplication(id);
+    if (detailId === id) setDetailId(null);
     await refresh();
     toast.success(`Deleted ${removed?.company ?? "application"}`);
   }
@@ -270,16 +276,25 @@ export default function App() {
           highlightId={highlightId}
           onDelete={handleDelete}
           onStatusChange={handleStatusChange}
-          onUpdate={handleUpdate}
+          onOpenDetail={(a) => setDetailId(a.id)}
         />
       ) : (
         <KanbanBoard
           applications={applications}
           onStatusChange={handleStatusChange}
+          onOpenDetail={(a) => setDetailId(a.id)}
         />
       )}
 
       <GmailPanel onImported={refresh} />
+
+      <DetailDrawer
+        application={detailApp}
+        onClose={() => setDetailId(null)}
+        onUpdate={handleUpdate}
+        onStatusChange={handleStatusChange}
+        onDelete={handleDelete}
+      />
 
       <CommandPalette
         open={paletteOpen}

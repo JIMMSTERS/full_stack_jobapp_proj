@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import type { Application, ApplicationCreate } from "../types";
+import type { Application } from "../types";
 import { STATUSES } from "../types";
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   highlightId?: number | null;
   onDelete: (id: number) => void;
   onStatusChange: (id: number, status: string) => void;
-  onUpdate: (id: number, changes: Partial<ApplicationCreate>) => Promise<void>;
+  onOpenDetail: (application: Application) => void;
 }
 
 const SORTS: { key: string; label: string }[] = [
@@ -22,7 +22,7 @@ export function ApplicationTable({
   highlightId,
   onDelete,
   onStatusChange,
-  onUpdate,
+  onOpenDetail,
 }: Props) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -126,7 +126,7 @@ export function ApplicationTable({
                 highlighted={a.id === highlightId}
                 onDelete={onDelete}
                 onStatusChange={onStatusChange}
-                onUpdate={onUpdate}
+                onOpenDetail={onOpenDetail}
               />
             ))}
           </tbody>
@@ -141,74 +141,16 @@ interface RowProps {
   highlighted: boolean;
   onDelete: (id: number) => void;
   onStatusChange: (id: number, status: string) => void;
-  onUpdate: (id: number, changes: Partial<ApplicationCreate>) => Promise<void>;
+  onOpenDetail: (application: Application) => void;
 }
 
-function Row({ application: a, highlighted, onDelete, onStatusChange, onUpdate }: RowProps) {
-  const [editing, setEditing] = useState(false);
-  const [company, setCompany] = useState(a.company);
-  const [position, setPosition] = useState(a.position);
-  const [url, setUrl] = useState(a.url ?? "");
-  const [saving, setSaving] = useState(false);
-
-  function startEdit() {
-    setCompany(a.company);
-    setPosition(a.position);
-    setUrl(a.url ?? "");
-    setEditing(true);
-  }
-
-  async function save() {
-    setSaving(true);
-    try {
-      await onUpdate(a.id, {
-        company: company.trim(),
-        position: position.trim(),
-        url: url.trim() || null,
-      });
-      setEditing(false);
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  if (editing) {
-    return (
-      <tr id={`app-row-${a.id}`} className={highlighted ? "row-highlight" : undefined}>
-        <td>
-          <input value={company} onChange={(e) => setCompany(e.target.value)} />
-        </td>
-        <td>
-          <input value={position} onChange={(e) => setPosition(e.target.value)} />
-        </td>
-        <td>
-          <span className={`badge badge-${a.status}`}>{a.status}</span>
-        </td>
-        <td>
-          <input
-            placeholder="Job URL"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-        </td>
-        <td>
-          <div className="actions">
-            <button onClick={save} disabled={saving}>
-              {saving ? "Saving…" : "Save"}
-            </button>
-            <button className="link" onClick={() => setEditing(false)}>
-              cancel
-            </button>
-          </div>
-        </td>
-      </tr>
-    );
-  }
-
+function Row({ application: a, highlighted, onDelete, onStatusChange, onOpenDetail }: RowProps) {
   return (
     <tr id={`app-row-${a.id}`} className={highlighted ? "row-highlight" : undefined}>
       <td>
-        {a.company}
+        <button className="link-cell" onClick={() => onOpenDetail(a)}>
+          {a.company}
+        </button>
         {a.source === "gmail" && (
           <span className="badge badge-source" title="Imported from Gmail">
             Gmail
@@ -240,9 +182,6 @@ function Row({ application: a, highlighted, onDelete, onStatusChange, onUpdate }
       </td>
       <td>
         <div className="actions">
-          <button className="link" onClick={startEdit}>
-            edit
-          </button>
           <button className="link" onClick={() => onDelete(a.id)}>
             delete
           </button>

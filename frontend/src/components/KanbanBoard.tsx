@@ -16,6 +16,7 @@ import { STATUSES } from "../types";
 interface Props {
   applications: Application[];
   onStatusChange: (id: number, status: string) => void;
+  onOpenDetail: (application: Application) => void;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -42,7 +43,13 @@ function CardContent({ app }: { app: Application }) {
   );
 }
 
-function Card({ app }: { app: Application }) {
+function Card({
+  app,
+  onOpenDetail,
+}: {
+  app: Application;
+  onOpenDetail: (application: Application) => void;
+}) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: app.id,
   });
@@ -50,6 +57,7 @@ function Card({ app }: { app: Application }) {
     <div
       ref={setNodeRef}
       className={`kanban-card${isDragging ? " is-dragging" : ""}`}
+      onClick={() => onOpenDetail(app)}
       {...listeners}
       {...attributes}
     >
@@ -58,7 +66,15 @@ function Card({ app }: { app: Application }) {
   );
 }
 
-function Column({ status, apps }: { status: string; apps: Application[] }) {
+function Column({
+  status,
+  apps,
+  onOpenDetail,
+}: {
+  status: string;
+  apps: Application[];
+  onOpenDetail: (application: Application) => void;
+}) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
   return (
     <div
@@ -73,7 +89,7 @@ function Column({ status, apps }: { status: string; apps: Application[] }) {
       </div>
       <div className="kanban-col-body">
         {apps.map((a) => (
-          <Card key={a.id} app={a} />
+          <Card key={a.id} app={a} onOpenDetail={onOpenDetail} />
         ))}
         {apps.length === 0 && <div className="kanban-empty">Drop here</div>}
       </div>
@@ -81,7 +97,7 @@ function Column({ status, apps }: { status: string; apps: Application[] }) {
   );
 }
 
-export function KanbanBoard({ applications, onStatusChange }: Props) {
+export function KanbanBoard({ applications, onStatusChange, onOpenDetail }: Props) {
   const [activeApp, setActiveApp] = useState<Application | null>(null);
   // Require a small drag distance so clicks/taps don't start a drag.
   const sensors = useSensors(
@@ -118,6 +134,7 @@ export function KanbanBoard({ applications, onStatusChange }: Props) {
             key={status}
             status={status}
             apps={applications.filter((a) => a.status === status)}
+            onOpenDetail={onOpenDetail}
           />
         ))}
       </div>

@@ -4,6 +4,7 @@ import type {
   ApplicationStats,
   GmailMessage,
   ImportSummary,
+  StatusEvent,
   User,
 } from "./types";
 
@@ -42,6 +43,14 @@ export async function listApplications(): Promise<Application[]> {
 export async function getApplicationStats(): Promise<ApplicationStats> {
   return handle(
     await fetch(`${BASE_URL}/applications/stats`, withCredentials)
+  );
+}
+
+export async function getApplicationEvents(
+  id: number
+): Promise<StatusEvent[]> {
+  return handle(
+    await fetch(`${BASE_URL}/applications/${id}/events`, withCredentials)
   );
 }
 
