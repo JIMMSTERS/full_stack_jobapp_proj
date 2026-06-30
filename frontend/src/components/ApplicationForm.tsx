@@ -38,6 +38,7 @@ export function ApplicationForm({ onCreate }: Props) {
       <h2>Add application</h2>
       <div className="row">
         <input
+          id="app-company-input"
           placeholder="Company"
           value={company}
           onChange={(e) => setCompany(e.target.value)}

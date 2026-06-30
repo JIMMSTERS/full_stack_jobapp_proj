@@ -104,6 +104,8 @@ def list_recent_messages(
             results.append(
                 {
                     "id": msg.get("id"),
+                    "thread_id": msg.get("threadId"),
+                    "internal_date": int(msg.get("internalDate", 0) or 0),
                     "subject": _header(headers, "Subject"),
                     "from": _header(headers, "From"),
                     "date": _header(headers, "Date"),

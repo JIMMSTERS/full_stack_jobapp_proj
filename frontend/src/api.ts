@@ -1,4 +1,11 @@
-import type { Application, ApplicationCreate, GmailMessage, User } from "./types";
+import type {
+  Application,
+  ApplicationCreate,
+  ApplicationStats,
+  GmailMessage,
+  ImportSummary,
+  User,
+} from "./types";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:8000";
 
@@ -30,6 +37,12 @@ export async function logout(): Promise<void> {
 
 export async function listApplications(): Promise<Application[]> {
   return handle(await fetch(`${BASE_URL}/applications`, withCredentials));
+}
+
+export async function getApplicationStats(): Promise<ApplicationStats> {
+  return handle(
+    await fetch(`${BASE_URL}/applications/stats`, withCredentials)
+  );
 }
 
 export async function createApplication(
@@ -70,5 +83,14 @@ export async function deleteApplication(id: number): Promise<void> {
 export async function fetchGmailMessages(limit = 20): Promise<GmailMessage[]> {
   return handle(
     await fetch(`${BASE_URL}/gmail/messages?limit=${limit}`, withCredentials)
+  );
+}
+
+export async function importFromGmail(limit = 25): Promise<ImportSummary> {
+  return handle(
+    await fetch(`${BASE_URL}/gmail/import?limit=${limit}`, {
+      method: "POST",
+      ...withCredentials,
+    })
   );
 }

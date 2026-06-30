@@ -35,8 +35,39 @@ class Application(ApplicationBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    source: str = "manual"
     created_at: datetime
     updated_at: datetime
+
+
+class ImportSummary(BaseModel):
+    """Result of importing applications from Gmail."""
+
+    created: int
+    updated: int
+    unchanged: int
+
+
+class WeeklyPoint(BaseModel):
+    """Number of applications created in the week starting ``week`` (ISO date)."""
+
+    week: str
+    count: int
+
+
+class ApplicationStats(BaseModel):
+    """Aggregated analytics over a user's applications for the dashboard."""
+
+    total: int
+    by_status: dict[str, int]
+    active: int
+    responded: int
+    offers: int
+    this_week: int
+    response_rate: float
+    interview_rate: float
+    offer_rate: float
+    weekly: list[WeeklyPoint]
 
 
 class User(BaseModel):

@@ -21,6 +21,15 @@ def list_applications(
     return crud.get_applications(db, current_user.id, skip=skip, limit=limit)
 
 
+@router.get("/stats", response_model=schemas.ApplicationStats)
+def application_stats(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Return aggregated analytics for the current user's applications."""
+    return crud.get_application_stats(db, current_user.id)
+
+
 @router.post("", response_model=schemas.Application, status_code=status.HTTP_201_CREATED)
 def create_application(
     payload: schemas.ApplicationCreate,

@@ -176,6 +176,34 @@ def detect_status(text: str) -> str | None:
     return None
 
 
+# Patterns like "application for the Software Engineer role" / "for Backend Engineer position".
+_POSITION_PATTERNS = (
+    re.compile(
+        r"(?:applied|application|candidacy|interview)\s+for\s+(?:the\s+)?"
+        r"(?:position\s+of\s+|role\s+of\s+)?(.+?)"
+        r"(?:\s+(?:role|position|opening|opportunity|req)\b|[.,!?]|$)",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\bfor\s+(?:the\s+)?(.+?)\s+(?:role|position|opening|opportunity)\b",
+        re.IGNORECASE,
+    ),
+)
+
+
+def guess_position(subject: str, snippet: str = "") -> str | None:
+    """Best-effort job title from an email subject/snippet, or None."""
+    for source in (subject or "", snippet or ""):
+        for pattern in _POSITION_PATTERNS:
+            match = pattern.search(source)
+            if match:
+                title = re.sub(r"\s+", " ", match.group(1)).strip(" -|,:")
+                # Reject overly long or generic captures.
+                if 2 <= len(title) <= 60 and title.lower() not in {"this", "a", "an"}:
+                    return title
+    return None
+
+
 def classify(subject: str, sender: str, snippet: str = "") -> dict:
     """Classify one email.
 

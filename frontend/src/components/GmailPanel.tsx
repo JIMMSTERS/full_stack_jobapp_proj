@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { fetchGmailMessages } from "../api";
-import type { GmailMessage } from "../types";
+import { fetchGmailMessages, importFromGmail } from "../api";
+import type { GmailMessage, ImportSummary } from "../types";
 
 function formatDate(raw: string): string {
   if (!raw) return "";
@@ -17,23 +17,41 @@ function formatDate(raw: string): string {
   });
 }
 
-export function GmailPanel() {
+export function GmailPanel({ onImported }: { onImported?: () => void }) {
   const [messages, setMessages] = useState<GmailMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [jobsOnly, setJobsOnly] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<ImportSummary | null>(null);
+  const [count, setCount] = useState(50);
 
   async function handleFetch() {
     setLoading(true);
     setError(null);
     try {
-      setMessages(await fetchGmailMessages(20));
+      setMessages(await fetchGmailMessages(count));
       setLoaded(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to fetch Gmail");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleImport() {
+    setImporting(true);
+    setError(null);
+    setImportResult(null);
+    try {
+      const result = await importFromGmail(count);
+      setImportResult(result);
+      onImported?.();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to import from Gmail");
+    } finally {
+      setImporting(false);
     }
   }
 
@@ -46,9 +64,23 @@ export function GmailPanel() {
     <section className="gmail-panel">
       <div className="gmail-header">
         <h2>Inbox preview</h2>
-        <button onClick={handleFetch} disabled={loading}>
-          {loading ? "Fetching…" : "Fetch recent emails"}
-        </button>
+        <div className="gmail-controls">
+          <label className="gmail-count-select">
+            Show
+            <select
+              value={count}
+              onChange={(e) => setCount(Number(e.target.value))}
+              disabled={loading || importing}
+            >
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </label>
+          <button onClick={handleFetch} disabled={loading}>
+            {loading ? "Fetching…" : "Fetch recent emails"}
+          </button>
+        </div>
       </div>
 
       {error && <div className="error">{error}</div>}
@@ -66,6 +98,20 @@ export function GmailPanel() {
             />
             Job-related only
           </label>
+        </div>
+      )}
+
+      {loaded && messages.length > 0 && (
+        <div className="gmail-import">
+          <button onClick={handleImport} disabled={importing}>
+            {importing ? "Importing…" : "Import job emails into tracker"}
+          </button>
+          {importResult && (
+            <span className="gmail-import-result">
+              Added {importResult.created} · Updated {importResult.updated} ·
+              Unchanged {importResult.unchanged}
+            </span>
+          )}
         </div>
       )}
 

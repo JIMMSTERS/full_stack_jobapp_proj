@@ -12,6 +12,7 @@ export interface Application {
   status: string;
   url: string | null;
   notes: string | null;
+  source: string;
   created_at: string;
   updated_at: string;
 }
@@ -44,6 +45,30 @@ export interface GmailMessage {
   date: string;
   snippet: string;
   classification: EmailClassification;
+}
+
+export interface ImportSummary {
+  created: number;
+  updated: number;
+  unchanged: number;
+}
+
+export interface WeeklyPoint {
+  week: string;
+  count: number;
+}
+
+export interface ApplicationStats {
+  total: number;
+  by_status: Record<string, number>;
+  active: number;
+  responded: number;
+  offers: number;
+  this_week: number;
+  response_rate: number;
+  interview_rate: number;
+  offer_rate: number;
+  weekly: WeeklyPoint[];
 }
 
 export const STATUSES = [

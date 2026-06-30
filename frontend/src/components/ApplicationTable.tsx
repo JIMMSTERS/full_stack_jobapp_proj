@@ -4,6 +4,7 @@ import { STATUSES } from "../types";
 
 interface Props {
   applications: Application[];
+  highlightId?: number | null;
   onDelete: (id: number) => void;
   onStatusChange: (id: number, status: string) => void;
   onUpdate: (id: number, changes: Partial<ApplicationCreate>) => Promise<void>;
@@ -11,6 +12,7 @@ interface Props {
 
 export function ApplicationTable({
   applications,
+  highlightId,
   onDelete,
   onStatusChange,
   onUpdate,
@@ -35,6 +37,7 @@ export function ApplicationTable({
           <Row
             key={a.id}
             application={a}
+            highlighted={a.id === highlightId}
             onDelete={onDelete}
             onStatusChange={onStatusChange}
             onUpdate={onUpdate}
@@ -47,12 +50,13 @@ export function ApplicationTable({
 
 interface RowProps {
   application: Application;
+  highlighted: boolean;
   onDelete: (id: number) => void;
   onStatusChange: (id: number, status: string) => void;
   onUpdate: (id: number, changes: Partial<ApplicationCreate>) => Promise<void>;
 }
 
-function Row({ application: a, onDelete, onStatusChange, onUpdate }: RowProps) {
+function Row({ application: a, highlighted, onDelete, onStatusChange, onUpdate }: RowProps) {
   const [editing, setEditing] = useState(false);
   const [company, setCompany] = useState(a.company);
   const [position, setPosition] = useState(a.position);
@@ -82,7 +86,7 @@ function Row({ application: a, onDelete, onStatusChange, onUpdate }: RowProps) {
 
   if (editing) {
     return (
-      <tr>
+      <tr id={`app-row-${a.id}`} className={highlighted ? "row-highlight" : undefined}>
         <td>
           <input value={company} onChange={(e) => setCompany(e.target.value)} />
         </td>
@@ -114,8 +118,15 @@ function Row({ application: a, onDelete, onStatusChange, onUpdate }: RowProps) {
   }
 
   return (
-    <tr>
-      <td>{a.company}</td>
+    <tr id={`app-row-${a.id}`} className={highlighted ? "row-highlight" : undefined}>
+      <td>
+        {a.company}
+        {a.source === "gmail" && (
+          <span className="badge badge-source" title="Imported from Gmail">
+            Gmail
+          </span>
+        )}
+      </td>
       <td>{a.position}</td>
       <td>
         <select

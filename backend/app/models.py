@@ -74,6 +74,12 @@ class Application(Base):
     status: Mapped[str] = mapped_column(String(50), nullable=False, default="applied")
     url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Where this application came from: "manual" or "gmail".
+    source: Mapped[str] = mapped_column(String(20), nullable=False, default="manual")
+    # Gmail thread this was imported from (used to dedupe imports). Null if manual.
+    gmail_thread_id: Mapped[str | None] = mapped_column(
+        String(255), nullable=True, index=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
