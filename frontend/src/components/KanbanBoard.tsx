@@ -12,6 +12,7 @@ import {
 } from "@dnd-kit/core";
 import type { Application } from "../types";
 import { STATUSES } from "../types";
+import { getFollowUp } from "../followUp";
 
 interface Props {
   applications: Application[];
@@ -28,6 +29,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 function CardContent({ app }: { app: Application }) {
+  const due = getFollowUp(app.follow_up_date, app.status);
   return (
     <>
       <div className="kanban-card-company">
@@ -39,6 +41,9 @@ function CardContent({ app }: { app: Application }) {
         )}
       </div>
       <div className="kanban-card-position">{app.position}</div>
+      {due && (
+        <span className={`due-pill due-${due.tone}`}>{due.label}</span>
+      )}
     </>
   );
 }

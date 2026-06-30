@@ -12,6 +12,7 @@ export interface Application {
   status: string;
   url: string | null;
   notes: string | null;
+  follow_up_date: string | null;
   source: string;
   created_at: string;
   updated_at: string;
@@ -23,6 +24,7 @@ export interface ApplicationCreate {
   status?: string;
   url?: string | null;
   notes?: string | null;
+  follow_up_date?: string | null;
 }
 
 export interface StatusEvent {

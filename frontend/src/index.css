@@ -1329,4 +1329,39 @@ button.link {
   cursor: default;
 }
 
+/* ---------- Follow-up due pills ---------- */
+
+.due-pill {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.due-overdue {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.due-soon {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.due-later {
+  background: var(--surface-3);
+  color: var(--text-muted);
+}
+
+.kanban-card .due-pill {
+  margin-left: 0;
+  margin-top: 0.4rem;
+}
+
+
 

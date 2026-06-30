@@ -1,8 +1,8 @@
 """SQLAlchemy ORM models."""
 
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -74,6 +74,8 @@ class Application(Base):
     status: Mapped[str] = mapped_column(String(50), nullable=False, default="applied")
     url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Optional date for the next follow-up / action on this application.
+    follow_up_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     # Where this application came from: "manual" or "gmail".
     source: Mapped[str] = mapped_column(String(20), nullable=False, default="manual")
     # Gmail thread this was imported from (used to dedupe imports). Null if manual.

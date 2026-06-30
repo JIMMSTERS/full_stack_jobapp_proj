@@ -1,6 +1,6 @@
 """Pydantic schemas for request/response validation."""
 
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict
 
@@ -13,6 +13,7 @@ class ApplicationBase(BaseModel):
     status: str = "applied"
     url: str | None = None
     notes: str | None = None
+    follow_up_date: date | None = None
 
 
 class ApplicationCreate(ApplicationBase):
@@ -27,6 +28,7 @@ class ApplicationUpdate(BaseModel):
     status: str | None = None
     url: str | None = None
     notes: str | None = None
+    follow_up_date: date | None = None
 
 
 class Application(ApplicationBase):

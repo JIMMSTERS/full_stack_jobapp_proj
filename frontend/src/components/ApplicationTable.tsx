@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Application } from "../types";
 import { STATUSES } from "../types";
+import { getFollowUp } from "../followUp";
 
 interface Props {
   applications: Application[];
@@ -145,6 +146,7 @@ interface RowProps {
 }
 
 function Row({ application: a, highlighted, onDelete, onStatusChange, onOpenDetail }: RowProps) {
+  const due = getFollowUp(a.follow_up_date, a.status);
   return (
     <tr id={`app-row-${a.id}`} className={highlighted ? "row-highlight" : undefined}>
       <td>
@@ -156,6 +158,7 @@ function Row({ application: a, highlighted, onDelete, onStatusChange, onOpenDeta
             Gmail
           </span>
         )}
+        {due && <span className={`due-pill due-${due.tone}`}>{due.label}</span>}
       </td>
       <td>{a.position}</td>
       <td>

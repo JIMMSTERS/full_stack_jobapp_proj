@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getApplicationEvents } from "../api";
+import { getFollowUp } from "../followUp";
 import type { Application, ApplicationCreate, StatusEvent } from "../types";
 import { STATUSES } from "../types";
 
@@ -61,6 +62,7 @@ export function DetailDrawer({
   const [position, setPosition] = useState("");
   const [url, setUrl] = useState("");
   const [notes, setNotes] = useState("");
+  const [followUp, setFollowUp] = useState("");
   const [saving, setSaving] = useState(false);
   const [events, setEvents] = useState<StatusEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
@@ -76,6 +78,7 @@ export function DetailDrawer({
     setPosition(application.position);
     setUrl(application.url ?? "");
     setNotes(application.notes ?? "");
+    setFollowUp(application.follow_up_date ?? "");
   }, [application?.id]);
 
   // Load the activity timeline; refetch when the application changes or is updated
@@ -116,7 +119,8 @@ export function DetailDrawer({
     company.trim() !== application.company ||
     position.trim() !== application.position ||
     (url.trim() || "") !== (application.url ?? "") ||
-    (notes.trim() || "") !== (application.notes ?? "");
+    (notes.trim() || "") !== (application.notes ?? "") ||
+    (followUp || "") !== (application.follow_up_date ?? "");
 
   async function save() {
     if (!application) return;
@@ -127,6 +131,7 @@ export function DetailDrawer({
         position: position.trim(),
         url: url.trim() || null,
         notes: notes.trim() || null,
+        follow_up_date: followUp || null,
       });
     } finally {
       setSaving(false);
@@ -135,6 +140,8 @@ export function DetailDrawer({
 
   // Timeline rendered newest-first so the latest activity is at the top.
   const timeline = [...events].reverse();
+
+  const due = getFollowUp(application.follow_up_date, application.status);
 
   return (
     <div className="drawer-overlay" onClick={onClose}>
@@ -195,6 +202,20 @@ export function DetailDrawer({
               placeholder="https://…"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+            />
+          </label>
+
+          <label className="drawer-field">
+            <span>
+              Follow-up date
+              {due && (
+                <span className={`due-pill due-${due.tone}`}>{due.label}</span>
+              )}
+            </span>
+            <input
+              type="date"
+              value={followUp}
+              onChange={(e) => setFollowUp(e.target.value)}
             />
           </label>
 
