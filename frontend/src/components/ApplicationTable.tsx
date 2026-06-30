@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { Application, ApplicationCreate } from "../types";
 import { STATUSES } from "../types";
 
@@ -10,6 +10,13 @@ interface Props {
   onUpdate: (id: number, changes: Partial<ApplicationCreate>) => Promise<void>;
 }
 
+const SORTS: { key: string; label: string }[] = [
+  { key: "newest", label: "Newest" },
+  { key: "oldest", label: "Oldest" },
+  { key: "company", label: "Company A–Z" },
+  { key: "status", label: "Status" },
+];
+
 export function ApplicationTable({
   applications,
   highlightId,
@@ -17,34 +24,115 @@ export function ApplicationTable({
   onStatusChange,
   onUpdate,
 }: Props) {
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortKey, setSortKey] = useState("newest");
+
+  const counts = useMemo(() => {
+    const tally: Record<string, number> = {};
+    for (const a of applications) {
+      tally[a.status] = (tally[a.status] ?? 0) + 1;
+    }
+    return tally;
+  }, [applications]);
+
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const filtered = applications.filter((a) => {
+      const matchesQuery =
+        !q || `${a.company} ${a.position}`.toLowerCase().includes(q);
+      const matchesStatus = statusFilter === "all" || a.status === statusFilter;
+      return matchesQuery && matchesStatus;
+    });
+    return [...filtered].sort((a, b) => {
+      switch (sortKey) {
+        case "oldest":
+          return a.created_at.localeCompare(b.created_at);
+        case "company":
+          return a.company.localeCompare(b.company);
+        case "status":
+          return STATUSES.indexOf(a.status) - STATUSES.indexOf(b.status);
+        case "newest":
+        default:
+          return b.created_at.localeCompare(a.created_at);
+      }
+    });
+  }, [applications, query, statusFilter, sortKey]);
+
   if (applications.length === 0) {
     return <p className="empty">No applications yet. Add your first one above.</p>;
   }
 
   return (
-    <table className="card table">
-      <thead>
-        <tr>
-          <th>Company</th>
-          <th>Position</th>
-          <th>Status</th>
-          <th>Link</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {applications.map((a) => (
-          <Row
-            key={a.id}
-            application={a}
-            highlighted={a.id === highlightId}
-            onDelete={onDelete}
-            onStatusChange={onStatusChange}
-            onUpdate={onUpdate}
-          />
+    <div className="table-section">
+      <div className="table-controls">
+        <input
+          className="table-search"
+          placeholder="Search company or position…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search applications"
+        />
+        <select
+          className="sort-select"
+          value={sortKey}
+          onChange={(e) => setSortKey(e.target.value)}
+          aria-label="Sort applications"
+        >
+          {SORTS.map((s) => (
+            <option key={s.key} value={s.key}>
+              Sort: {s.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="filter-chips" role="group" aria-label="Filter by status">
+        <button
+          className={`chip${statusFilter === "all" ? " is-active" : ""}`}
+          onClick={() => setStatusFilter("all")}
+        >
+          All <span className="chip-count">{applications.length}</span>
+        </button>
+        {STATUSES.map((s) => (
+          <button
+            key={s}
+            className={`chip chip-${s}${statusFilter === s ? " is-active" : ""}`}
+            onClick={() => setStatusFilter(s)}
+          >
+            {s} <span className="chip-count">{counts[s] ?? 0}</span>
+          </button>
         ))}
-      </tbody>
-    </table>
+      </div>
+
+      {visible.length === 0 ? (
+        <p className="empty">No applications match your search or filter.</p>
+      ) : (
+        <table className="card table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Position</th>
+              <th>Status</th>
+              <th>Link</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map((a) => (
+              <Row
+                key={a.id}
+                application={a}
+                highlighted={a.id === highlightId}
+                onDelete={onDelete}
+                onStatusChange={onStatusChange}
+                onUpdate={onUpdate}
+              />
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }
 
