@@ -1,7 +1,110 @@
 :root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-3: #eef2f7;
+  --border: #e2e8f0;
+  --border-strong: #cbd4e1;
+  --text: #1f2933;
+  --text-strong: #0f172a;
+  --text-muted: #475569;
+  --text-subtle: #94a3b8;
+  --danger: #b91c1c;
+  --shadow: rgba(15, 23, 42, 0.12);
+  --overlay: rgba(15, 23, 42, 0.45);
+  --highlight: #fef9c3;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: #eef2ff;
+
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  color: #1f2933;
-  background: #f5f7fa;
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-2: #263449;
+  --surface-3: #334155;
+  --border: #334155;
+  --border-strong: #475569;
+  --text: #e2e8f0;
+  --text-strong: #f8fafc;
+  --text-muted: #cbd5e1;
+  --text-subtle: #94a3b8;
+  --danger: #f87171;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --overlay: rgba(2, 6, 23, 0.65);
+  --highlight: #422006;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-soft: #1e3a5f;
+  color-scheme: dark;
+}
+
+[data-theme="midnight"] {
+  --bg: #161228;
+  --surface: #221a3d;
+  --surface-2: #2c2350;
+  --surface-3: #3a2f63;
+  --border: #3a2f63;
+  --border-strong: #4c3f7e;
+  --text: #e6e1f5;
+  --text-strong: #faf8ff;
+  --text-muted: #c4bce0;
+  --text-subtle: #9a92bd;
+  --danger: #fb7185;
+  --shadow: rgba(0, 0, 0, 0.55);
+  --overlay: rgba(10, 6, 25, 0.65);
+  --highlight: #3a2f63;
+  --accent: #8b5cf6;
+  --accent-hover: #a78bfa;
+  --accent-soft: #2c2350;
+  color-scheme: dark;
+}
+
+[data-theme="sepia"] {
+  --bg: #f1e7d0;
+  --surface: #fbf6e9;
+  --surface-2: #efe6cf;
+  --surface-3: #e8dcc0;
+  --border: #ddd0b0;
+  --border-strong: #c9b890;
+  --text: #433422;
+  --text-strong: #2b2113;
+  --text-muted: #6b5840;
+  --text-subtle: #9c886a;
+  --danger: #b04a2f;
+  --shadow: rgba(67, 52, 34, 0.18);
+  --overlay: rgba(67, 52, 34, 0.4);
+  --highlight: #f3e1a8;
+  --accent: #b45309;
+  --accent-hover: #92400e;
+  --accent-soft: #f0e2c4;
+  color-scheme: light;
+}
+
+[data-theme="forest"] {
+  --bg: #0e1f17;
+  --surface: #163024;
+  --surface-2: #1d3c2d;
+  --surface-3: #25513c;
+  --border: #25513c;
+  --border-strong: #357a59;
+  --text: #d7ece0;
+  --text-strong: #f0faf4;
+  --text-muted: #a7ccb8;
+  --text-subtle: #6fa588;
+  --danger: #f87171;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --overlay: rgba(2, 18, 11, 0.6);
+  --highlight: #2f5e2f;
+  --accent: #22c55e;
+  --accent-hover: #4ade80;
+  --accent-soft: #1d3c2d;
+  color-scheme: dark;
 }
 
 * {
@@ -10,6 +113,20 @@
 
 body {
   margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.card,
+.kanban-col,
+.kanban-card,
+.gmail-item,
+.view-tab,
+.chip,
+input,
+select {
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .app {
@@ -21,16 +138,17 @@ body {
 header h1 {
   margin: 0;
   font-size: 2rem;
+  color: var(--text-strong);
 }
 
 header p {
   margin: 0.25rem 0 1.5rem;
-  color: #647280;
+  color: var(--text-muted);
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #e4e9f0;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1rem;
   margin-bottom: 1.25rem;
@@ -39,6 +157,7 @@ header p {
 .form h2 {
   margin: 0 0 0.75rem;
   font-size: 1.1rem;
+  color: var(--text-strong);
 }
 
 .row {
@@ -51,14 +170,16 @@ input,
 select {
   flex: 1;
   padding: 0.5rem 0.6rem;
-  border: 1px solid #cbd4e1;
+  border: 1px solid var(--border-strong);
   border-radius: 6px;
   font-size: 0.95rem;
   width: 100%;
+  background: var(--surface);
+  color: var(--text);
 }
 
 button {
-  background: #2563eb;
+  background: var(--accent);
   color: #fff;
   border: none;
   padding: 0.55rem 1rem;
@@ -74,7 +195,7 @@ button:disabled {
 
 button.link {
   background: none;
-  color: #b91c1c;
+  color: var(--danger);
   padding: 0;
 }
 
@@ -94,7 +215,8 @@ button.link {
 .table td {
   text-align: left;
   padding: 0.6rem 0.75rem;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
 }
 
 .badge {
@@ -111,7 +233,7 @@ button.link {
 .badge-interview { background: #fef9c3; color: #854d0e; }
 
 .empty {
-  color: #647280;
+  color: var(--text-muted);
   text-align: center;
   padding: 1rem;
 }
@@ -144,21 +266,50 @@ button.link {
 }
 
 .user-name {
-  color: #334155;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
 .logout-button {
-  background: #f1f5f9;
-  color: #334155;
-  border: 1px solid #cbd5e1;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
   cursor: pointer;
 }
 
 .logout-button:hover {
-  background: #e2e8f0;
+  background: var(--surface-3);
+}
+
+.theme-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.4rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+}
+
+.theme-swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  background: var(--swatch);
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.theme-swatch:hover {
+  transform: scale(1.12);
+}
+
+.theme-swatch.is-active {
+  border-color: var(--accent);
 }
 
 .login {
@@ -169,7 +320,7 @@ button.link {
 
 .login-button {
   display: inline-block;
-  background: #2563eb;
+  background: var(--accent);
   color: #ffffff;
   text-decoration: none;
   padding: 0.7rem 1.4rem;
@@ -178,12 +329,12 @@ button.link {
 }
 
 .login-button:hover {
-  background: #1d4ed8;
+  background: var(--accent-hover);
 }
 
 .gmail-panel {
   margin-top: 2rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   padding-top: 1.25rem;
 }
 
@@ -197,6 +348,7 @@ button.link {
 .gmail-header h2 {
   margin: 0;
   font-size: 1.1rem;
+  color: var(--text-strong);
 }
 
 .gmail-list {
@@ -209,10 +361,10 @@ button.link {
 }
 
 .gmail-item {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.7rem 0.9rem;
-  background: #fff;
+  background: var(--surface);
 }
 
 .gmail-link {
@@ -223,24 +375,24 @@ button.link {
 }
 
 .gmail-item:hover {
-  border-color: #94a3b8;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+  border-color: var(--border-strong);
+  box-shadow: 0 1px 4px var(--shadow);
 }
 
 .gmail-subject {
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-strong);
 }
 
 .gmail-meta {
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--text-subtle);
   margin: 0.15rem 0;
 }
 
 .gmail-snippet {
   font-size: 0.85rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .gmail-toolbar {
@@ -249,7 +401,7 @@ button.link {
   justify-content: space-between;
   margin: 0.5rem 0 0.75rem;
   font-size: 0.85rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .gmail-filter {
@@ -277,7 +429,7 @@ button.link {
   align-items: center;
   gap: 0.3rem;
   font-size: 0.85rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .gmail-import-result {
@@ -300,17 +452,17 @@ button.link {
 }
 
 .gmail-item.is-job {
-  border-color: #c7d2fe;
-  background: #f8faff;
+  border-color: var(--accent);
+  background: var(--surface-2);
 }
 
 .gmail-company {
-  color: #4338ca;
+  color: var(--accent);
   font-weight: 600;
 }
 
 .gmail-date {
-  color: #94a3b8;
+  color: var(--text-subtle);
   white-space: nowrap;
 }
 
@@ -370,7 +522,7 @@ button.link {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+  background: var(--surface);
 }
 
 .kpi-value {
@@ -383,12 +535,12 @@ button.link {
 .kpi-label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .kpi-sub {
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: var(--text-subtle);
 }
 
 .dash-charts {
@@ -404,7 +556,7 @@ button.link {
 .dash-chart h3 {
   margin: 0 0 0.9rem;
   font-size: 0.95rem;
-  color: #0f172a;
+  color: var(--text-strong);
 }
 
 .bar-list {
@@ -422,11 +574,11 @@ button.link {
 
 .bar-label {
   font-size: 0.82rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .bar-track {
-  background: #eef2f7;
+  background: var(--surface-3);
   border-radius: 999px;
   height: 14px;
   overflow: hidden;
@@ -442,7 +594,7 @@ button.link {
 .bar-value {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-strong);
   display: flex;
   align-items: baseline;
   gap: 0.35rem;
@@ -451,7 +603,7 @@ button.link {
 .bar-share {
   font-size: 0.7rem;
   font-weight: 500;
-  color: #94a3b8;
+  color: var(--text-subtle);
 }
 
 .spark {
@@ -499,7 +651,7 @@ button.link {
 
 .spark-x {
   font-size: 0.68rem;
-  color: #94a3b8;
+  color: var(--text-subtle);
   white-space: nowrap;
 }
 
@@ -518,9 +670,9 @@ button.link {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #cbd5e1;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   padding: 0.4rem 0.7rem;
   font-size: 0.85rem;
@@ -528,23 +680,23 @@ button.link {
 }
 
 .cmdk-trigger:hover {
-  background: #e2e8f0;
+  background: var(--surface-3);
 }
 
 .cmdk-trigger kbd {
   font-family: inherit;
   font-size: 0.72rem;
-  background: #fff;
-  border: 1px solid #cbd5e1;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 5px;
   padding: 0.05rem 0.35rem;
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .cmdk-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--overlay);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: flex-start;
@@ -555,9 +707,9 @@ button.link {
 
 .cmdk-panel {
   width: min(620px, 92vw);
-  background: #fff;
+  background: var(--surface);
   border-radius: 14px;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.3);
+  box-shadow: 0 24px 60px var(--shadow);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -566,12 +718,14 @@ button.link {
 
 .cmdk-input {
   border: none;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--border);
   border-radius: 0;
   padding: 1rem 1.1rem;
   font-size: 1rem;
   width: 100%;
   outline: none;
+  background: var(--surface);
+  color: var(--text);
 }
 
 .cmdk-list {
@@ -583,7 +737,7 @@ button.link {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #94a3b8;
+  color: var(--text-subtle);
   padding: 0.5rem 0.7rem 0.25rem;
 }
 
@@ -598,24 +752,24 @@ button.link {
 }
 
 .cmdk-item.is-active {
-  background: #eef2ff;
+  background: var(--accent-soft);
 }
 
 .cmdk-item-label {
   font-size: 0.9rem;
-  color: #1e293b;
+  color: var(--text-strong);
 }
 
 .cmdk-item-hint {
   font-size: 0.72rem;
   text-transform: capitalize;
-  color: #94a3b8;
+  color: var(--text-subtle);
 }
 
 .cmdk-empty {
   padding: 1.25rem;
   text-align: center;
-  color: #94a3b8;
+  color: var(--text-subtle);
   font-size: 0.9rem;
 }
 
@@ -623,15 +777,15 @@ button.link {
   display: flex;
   gap: 1rem;
   padding: 0.6rem 1rem;
-  border-top: 1px solid #eef2f7;
+  border-top: 1px solid var(--border);
   font-size: 0.74rem;
-  color: #94a3b8;
+  color: var(--text-subtle);
 }
 
 .cmdk-footer kbd {
   font-family: inherit;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: 4px;
   padding: 0.02rem 0.3rem;
   margin-right: 0.2rem;
@@ -644,7 +798,7 @@ button.link {
 @keyframes row-flash {
   0%,
   35% {
-    background: #fef9c3;
+    background: var(--highlight);
   }
   100% {
     background: transparent;
@@ -662,20 +816,22 @@ button.link {
 .table-search {
   flex: 1;
   padding: 0.55rem 0.75rem;
-  border: 1px solid #cbd4e1;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 0.92rem;
+  background: var(--surface);
+  color: var(--text);
 }
 
 .sort-select {
   flex: 0 0 auto;
   width: auto;
   padding: 0.55rem 0.75rem;
-  border: 1px solid #cbd4e1;
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 0.88rem;
-  color: #475569;
-  background: #fff;
+  color: var(--text-muted);
+  background: var(--surface);
   cursor: pointer;
 }
 
@@ -690,8 +846,8 @@ button.link {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--surface-2);
+  color: var(--text-muted);
   border: 1px solid transparent;
   border-radius: 999px;
   padding: 0.3rem 0.7rem;
@@ -702,14 +858,14 @@ button.link {
 }
 
 .chip:hover {
-  background: #e2e8f0;
+  background: var(--surface-3);
 }
 
 .chip-count {
   font-size: 0.72rem;
   font-weight: 700;
-  background: #fff;
-  color: #64748b;
+  background: var(--surface);
+  color: var(--text-muted);
   border-radius: 999px;
   padding: 0.02rem 0.4rem;
   min-width: 1.1rem;
@@ -717,7 +873,7 @@ button.link {
 }
 
 .chip.is-active {
-  background: #1e293b;
+  background: var(--accent);
   color: #fff;
 }
 
@@ -746,7 +902,7 @@ button.link {
 
 .view-toggle {
   display: inline-flex;
-  background: #eef2f7;
+  background: var(--surface-2);
   border-radius: 8px;
   padding: 3px;
   gap: 3px;
@@ -755,7 +911,7 @@ button.link {
 
 .view-tab {
   background: transparent;
-  color: #475569;
+  color: var(--text-muted);
   border: none;
   border-radius: 6px;
   padding: 0.35rem 1rem;
@@ -765,9 +921,9 @@ button.link {
 }
 
 .view-tab.is-active {
-  background: #fff;
-  color: #0f172a;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+  background: var(--surface);
+  color: var(--text-strong);
+  box-shadow: 0 1px 2px var(--shadow);
 }
 
 /* ---------- Kanban board ---------- */
@@ -781,8 +937,8 @@ button.link {
 }
 
 .kanban-col {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 0.6rem;
   display: flex;
@@ -792,8 +948,8 @@ button.link {
 }
 
 .kanban-col.is-over {
-  background: #eef2ff;
-  border-color: #a5b4fc;
+  background: var(--accent-soft);
+  border-color: var(--accent);
 }
 
 .kanban-col-head {
@@ -806,7 +962,7 @@ button.link {
 .kanban-col-title {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #334155;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -817,7 +973,7 @@ button.link {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #94a3b8;
+  background: var(--text-subtle);
 }
 
 .kanban-dot-applied::before {
@@ -839,8 +995,8 @@ button.link {
 .kanban-col-count {
   font-size: 0.72rem;
   font-weight: 700;
-  color: #64748b;
-  background: #fff;
+  color: var(--text-muted);
+  background: var(--surface);
   border-radius: 999px;
   padding: 0.02rem 0.45rem;
 }
@@ -853,12 +1009,12 @@ button.link {
 }
 
 .kanban-card {
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.6rem 0.65rem;
   cursor: grab;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 1px 2px var(--shadow);
 }
 
 .kanban-card:active {
@@ -871,27 +1027,27 @@ button.link {
 
 .kanban-card.is-overlay {
   cursor: grabbing;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.22);
+  box-shadow: 0 10px 24px var(--shadow);
   transform: rotate(2deg);
 }
 
 .kanban-card-company {
   font-weight: 600;
   font-size: 0.88rem;
-  color: #0f172a;
+  color: var(--text-strong);
 }
 
 .kanban-card-position {
   font-size: 0.8rem;
-  color: #64748b;
+  color: var(--text-muted);
   margin-top: 0.15rem;
 }
 
 .kanban-empty {
   font-size: 0.76rem;
-  color: #94a3b8;
+  color: var(--text-subtle);
   text-align: center;
   padding: 0.8rem 0;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--border-strong);
   border-radius: 8px;
 }

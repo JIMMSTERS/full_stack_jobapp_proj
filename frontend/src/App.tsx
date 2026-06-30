@@ -20,6 +20,27 @@ import { KanbanBoard } from "./components/KanbanBoard";
 
 type View = "table" | "board";
 
+type ThemeId = "light" | "dark" | "midnight" | "sepia" | "forest";
+
+const THEMES: { id: ThemeId; label: string; swatch: string }[] = [
+  { id: "light", label: "Light", swatch: "#ffffff" },
+  { id: "dark", label: "Dark", swatch: "#0f172a" },
+  { id: "midnight", label: "Midnight", swatch: "#221a3d" },
+  { id: "sepia", label: "Sepia", swatch: "#f1e7d0" },
+  { id: "forest", label: "Forest", swatch: "#163024" },
+];
+
+const DARK_THEMES: ThemeId[] = ["dark", "midnight", "forest"];
+
+function getInitialTheme(): ThemeId {
+  const saved = localStorage.getItem("offerflow-theme");
+  if (saved && THEMES.some((t) => t.id === saved)) {
+    return saved as ThemeId;
+  }
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return prefersDark ? "dark" : "light";
+}
+
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -30,6 +51,7 @@ export default function App() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [highlightId, setHighlightId] = useState<number | null>(null);
   const [view, setView] = useState<View>("table");
+  const [theme, setTheme] = useState<ThemeId>(getInitialTheme);
 
   async function refresh() {
     try {
@@ -65,6 +87,12 @@ export default function App() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  // Apply and persist the selected theme.
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("offerflow-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     if (user) {
@@ -185,6 +213,19 @@ export default function App() {
               <span className="cmdk-trigger-text">Search…</span>
               <kbd>⌘K</kbd>
             </button>
+            <div className="theme-picker" role="group" aria-label="Theme">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  className={`theme-swatch${theme === t.id ? " is-active" : ""}`}
+                  style={{ ["--swatch" as string]: t.swatch }}
+                  onClick={() => setTheme(t.id)}
+                  title={t.label}
+                  aria-label={t.label}
+                  aria-pressed={theme === t.id}
+                />
+              ))}
+            </div>
             {user.picture && (
               <img className="avatar" src={user.picture} alt="" />
             )}
@@ -250,7 +291,12 @@ export default function App() {
         onSignOut={handleLogout}
       />
 
-      <Toaster position="bottom-right" richColors closeButton />
+      <Toaster
+        position="bottom-right"
+        richColors
+        closeButton
+        theme={DARK_THEMES.includes(theme) ? "dark" : "light"}
+      />
     </div>
   );
 }
