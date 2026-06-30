@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { fetchGmailMessages, importFromGmail } from "../api";
 import type { GmailMessage, ImportSummary } from "../types";
 
@@ -48,8 +49,12 @@ export function GmailPanel({ onImported }: { onImported?: () => void }) {
       const result = await importFromGmail(count);
       setImportResult(result);
       onImported?.();
+      toast.success(
+        `Import complete · ${result.created} added, ${result.updated} updated`
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to import from Gmail");
+      toast.error("Gmail import failed");
     } finally {
       setImporting(false);
     }
