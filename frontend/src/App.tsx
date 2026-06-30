@@ -18,6 +18,11 @@ import { Dashboard } from "./components/Dashboard";
 import { DetailDrawer } from "./components/DetailDrawer";
 import { GmailPanel } from "./components/GmailPanel";
 import { KanbanBoard } from "./components/KanbanBoard";
+import {
+  BoardSkeleton,
+  DashboardSkeleton,
+  TableSkeleton,
+} from "./components/Skeleton";
 
 type View = "table" | "board";
 
@@ -181,7 +186,16 @@ export default function App() {
   if (!authChecked) {
     return (
       <div className="app">
-        <p className="empty">Loading…</p>
+        <header>
+          <div className="header-row">
+            <div>
+              <h1>OfferFlow</h1>
+              <p>Track your job applications in one place.</p>
+            </div>
+          </div>
+        </header>
+        <DashboardSkeleton />
+        <TableSkeleton />
       </div>
     );
   }
@@ -245,7 +259,7 @@ export default function App() {
 
       {error && <div className="error">{error}</div>}
 
-      <Dashboard stats={stats} />
+      {loading && !stats ? <DashboardSkeleton /> : <Dashboard stats={stats} />}
 
       <ApplicationForm onCreate={handleCreate} />
 
@@ -269,7 +283,11 @@ export default function App() {
       </div>
 
       {loading ? (
-        <p className="empty">Loading…</p>
+        view === "table" ? (
+          <TableSkeleton />
+        ) : (
+          <BoardSkeleton />
+        )
       ) : view === "table" ? (
         <ApplicationTable
           applications={applications}
