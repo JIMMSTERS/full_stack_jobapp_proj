@@ -1,0 +1,44 @@
+# Render Blueprint for the OfferFlow backend + managed Postgres.
+# Deploy by connecting this repo at https://dashboard.render.com/blueprints
+# and filling in the secret env vars marked "sync: false".
+
+databases:
+  - name: offerflow-db
+    plan: free
+    databaseName: offerflow
+    user: offerflow
+
+services:
+  - type: web
+    name: offerflow-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # Apply migrations, then serve. --proxy-headers lets FastAPI see the real
+    # https scheme behind Render's TLS proxy (needed for the OAuth redirect URI
+    # and Secure cookies).
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: offerflow-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: COOKIE_SAMESITE
+        value: none
+      - key: COOKIE_SECURE
+        value: "true"
+      # Fill these in the Render dashboard (kept out of source control):
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false

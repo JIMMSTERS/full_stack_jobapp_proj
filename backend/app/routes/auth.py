@@ -50,7 +50,8 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
         key=config.SESSION_COOKIE_NAME,
         value=session.token,
         httponly=True,
-        samesite="lax",
+        samesite=config.COOKIE_SAMESITE,
+        secure=config.COOKIE_SECURE,
         max_age=config.SESSION_TTL_DAYS * 24 * 60 * 60,
         path="/",
     )
@@ -64,7 +65,12 @@ def logout(request: Request, db: Session = Depends(get_db)):
     if token:
         auth.delete_session(db, token)
     response = Response(status_code=status.HTTP_204_NO_CONTENT)
-    response.delete_cookie(key=config.SESSION_COOKIE_NAME, path="/")
+    response.delete_cookie(
+        key=config.SESSION_COOKIE_NAME,
+        path="/",
+        samesite=config.COOKIE_SAMESITE,
+        secure=config.COOKIE_SECURE,
+    )
     return response
 
 

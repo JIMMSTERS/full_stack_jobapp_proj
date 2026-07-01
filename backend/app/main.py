@@ -9,12 +9,6 @@ from starlette.middleware.sessions import SessionMiddleware
 from app import config
 from app.routes import applications, auth, gmail
 
-# CORS origins allowed to call this API (React dev server).
-ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,11 +19,16 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="OfferFlow API", version="0.1.0", lifespan=lifespan)
 
 # Signs the short-lived cookie Authlib uses to hold the OAuth "state" value.
-app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, same_site="lax")
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=config.SECRET_KEY,
+    same_site=config.COOKIE_SAMESITE,
+    https_only=config.COOKIE_SECURE,
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=config.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
