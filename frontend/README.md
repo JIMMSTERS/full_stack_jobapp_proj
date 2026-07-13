@@ -26,7 +26,8 @@ session cookie from the OAuth flow is shared correctly.
 ## Environment
 
 The API base URL is read from `VITE_API_URL` and defaults to `http://127.0.0.1:8000`.
-For a deployed frontend, set `VITE_API_URL` to your API URL (e.g. in Vercel project settings).
+For a deployed frontend, set `VITE_API_URL` to your API URL (e.g. in the Render
+static-site env vars, or any host's build settings). Use no trailing slash.
 
 ## Scripts
 

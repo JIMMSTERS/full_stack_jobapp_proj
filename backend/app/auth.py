@@ -4,7 +4,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 from authlib.integrations.starlette_client import OAuth
-from fastapi import Cookie, Depends, HTTPException, status
+from fastapi import Cookie, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import config, models
@@ -79,18 +79,35 @@ def delete_session(db: Session, token: str) -> None:
         db.commit()
 
 
+def _bearer_token(authorization: str | None) -> str | None:
+    """Extract the token from an ``Authorization: Bearer <token>`` header."""
+    if not authorization:
+        return None
+    scheme, _, token = authorization.partition(" ")
+    if scheme.lower() != "bearer" or not token.strip():
+        return None
+    return token.strip()
+
+
 def get_current_user(
     db: Session = Depends(get_db),
     offerflow_session: str | None = Cookie(default=None),
+    authorization: str | None = Header(default=None),
 ) -> models.User:
-    """Resolve the logged-in user from the session cookie, or 401."""
-    if not offerflow_session:
+    """Resolve the logged-in user from the session token, or 401.
+
+    The token comes from the ``offerflow_session`` cookie (web app) or an
+    ``Authorization: Bearer <token>`` header (browser extension / API clients).
+    Both resolve against the same server-side ``Session`` table.
+    """
+    token = offerflow_session or _bearer_token(authorization)
+    if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
         )
     session = (
         db.query(models.Session)
-        .filter(models.Session.token == offerflow_session)
+        .filter(models.Session.token == token)
         .one_or_none()
     )
     if session is None:

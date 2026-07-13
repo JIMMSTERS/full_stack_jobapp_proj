@@ -22,6 +22,9 @@ env/
 .mypy_cache/
 .ruff_cache/
 *.egg-info/
+.coverage
+.coverage.*
+htmlcov/
 
 # ---------- Databases ----------
 *.sqlite3

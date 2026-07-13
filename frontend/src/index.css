@@ -314,7 +314,10 @@ button.link {
 
 .login {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  gap: 0.75rem;
   padding: 2rem 0;
 }
 
@@ -330,6 +333,54 @@ button.link {
 
 .login-button:hover {
   background: var(--accent-hover);
+}
+
+.demo-button {
+  background: var(--surface-2);
+  color: var(--text-strong);
+  border: 1px solid var(--border-strong);
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.demo-button:hover:not(:disabled) {
+  background: var(--surface-3);
+}
+
+.login-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  max-width: 22rem;
+  text-align: center;
+}
+
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  color: var(--text-strong);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1rem;
+  font-size: 0.86rem;
+}
+
+.demo-banner-exit {
+  flex-shrink: 0;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .gmail-panel {
@@ -1362,6 +1413,52 @@ button.link {
   margin-left: 0;
   margin-top: 0.4rem;
 }
+
+/* ---------- Connect browser extension ---------- */
+
+.connect-extension {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+}
+
+.connect-extension-head h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
+  color: var(--text-strong);
+}
+
+.connect-extension-head p {
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 42rem;
+}
+
+.connect-token-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.connect-token-input {
+  flex: 1 1 22rem;
+  min-width: 16rem;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.connect-regen-btn {
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
 
 
 

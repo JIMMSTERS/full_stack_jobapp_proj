@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>OfferFlow</title>
+  </head>
+  <body>
+    <header class="pop-header">
+      <span class="pop-logo">OfferFlow</span>
+      <button id="settings-toggle" class="pop-icon-btn" title="Settings" aria-label="Settings">⚙</button>
+    </header>
+
+    <!-- Save form (shown when connected) -->
+    <section id="save-view" hidden>
+      <label class="pop-field">
+        <span>Company</span>
+        <input id="company" type="text" autocomplete="off" />
+      </label>
+      <label class="pop-field">
+        <span>Position</span>
+        <input id="position" type="text" autocomplete="off" />
+      </label>
+      <label class="pop-field">
+        <span>Status</span>
+        <select id="status"></select>
+      </label>
+      <label class="pop-field">
+        <span>URL</span>
+        <input id="url" type="text" autocomplete="off" />
+      </label>
+      <button id="save-btn" class="pop-primary">Save to OfferFlow</button>
+      <p id="save-status" class="pop-note" role="status"></p>
+    </section>
+
+    <!-- Connect view (shown when no/invalid token) -->
+    <section id="connect-view" hidden>
+      <p class="pop-note">
+        Connect this extension to your OfferFlow account. In the web app, open
+        <strong>Browser extension</strong>, generate a token, and paste it here.
+      </p>
+      <label class="pop-field">
+        <span>Pairing token</span>
+        <input id="token-input" type="password" autocomplete="off" placeholder="Paste token…" />
+      </label>
+      <button id="connect-btn" class="pop-primary">Connect</button>
+      <p id="connect-status" class="pop-note" role="status"></p>
+    </section>
+
+    <!-- Settings view -->
+    <section id="settings-view" hidden>
+      <label class="pop-field">
+        <span>API base URL</span>
+        <input id="api-base" type="text" autocomplete="off" />
+      </label>
+      <label class="pop-field">
+        <span>Pairing token</span>
+        <input id="settings-token" type="password" autocomplete="off" />
+      </label>
+      <div class="pop-row">
+        <button id="settings-save" class="pop-primary">Save</button>
+        <button id="disconnect-btn" class="pop-secondary">Disconnect</button>
+      </div>
+      <p id="settings-status" class="pop-note" role="status"></p>
+    </section>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -8,6 +8,7 @@ import {
   listApplications,
   loginUrl,
   logout,
+  startDemo,
   updateApplication,
 } from "./api";
 import type { Application, ApplicationCreate, ApplicationStats, User } from "./types";
@@ -16,6 +17,7 @@ import { ApplicationTable } from "./components/ApplicationTable";
 import { CommandPalette } from "./components/CommandPalette";
 import { Dashboard } from "./components/Dashboard";
 import { DetailDrawer } from "./components/DetailDrawer";
+import { ConnectExtension } from "./components/ConnectExtension";
 import { GmailPanel } from "./components/GmailPanel";
 import { KanbanBoard } from "./components/KanbanBoard";
 import {
@@ -59,6 +61,7 @@ export default function App() {
   const [view, setView] = useState<View>("table");
   const [theme, setTheme] = useState<ThemeId>(getInitialTheme);
   const [detailId, setDetailId] = useState<number | null>(null);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   const detailApp =
     detailId == null ? null : applications.find((a) => a.id === detailId) ?? null;
@@ -211,6 +214,27 @@ export default function App() {
           <a className="login-button" href={loginUrl}>
             Sign in with Google
           </a>
+          <button
+            className="demo-button"
+            onClick={async () => {
+              setDemoLoading(true);
+              try {
+                const demoUser = await startDemo();
+                setUser(demoUser);
+              } catch {
+                setError("Could not start the demo. Please try again.");
+              } finally {
+                setDemoLoading(false);
+              }
+            }}
+            disabled={demoLoading}
+          >
+            {demoLoading ? "Loading demo\u2026" : "Try the live demo"}
+          </button>
+          <p className="login-hint">
+            The demo drops you into a sandbox account with sample applications —
+            no sign-in required.
+          </p>
         </div>
       </div>
     );
@@ -218,6 +242,17 @@ export default function App() {
 
   return (
     <div className="app">
+      {user.is_demo && (
+        <div className="demo-banner" role="status">
+          <span>
+            <strong>Demo mode.</strong> You're in a sandbox account with sample
+            data. Feel free to add, drag, and edit — it won't affect anyone else.
+          </span>
+          <button className="demo-banner-exit" onClick={handleLogout}>
+            Exit demo
+          </button>
+        </div>
+      )}
       <header>
         <div className="header-row">
           <div>
@@ -305,6 +340,8 @@ export default function App() {
       )}
 
       <GmailPanel onImported={refresh} />
+
+      <ConnectExtension />
 
       <DetailDrawer
         application={detailApp}

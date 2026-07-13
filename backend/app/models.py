@@ -37,6 +37,11 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
 
+    @property
+    def is_demo(self) -> bool:
+        """True for throwaway public-demo accounts (``demo-*`` subjects)."""
+        return self.google_sub.startswith("demo-")
+
 
 class Session(Base):
     """A server-side login session identified by an opaque cookie token."""

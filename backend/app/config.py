@@ -44,3 +44,8 @@ ALLOWED_ORIGINS = [
 COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "lax").strip().lower()
 COOKIE_SECURE = _bool("COOKIE_SECURE", False)
 
+# Enables the public "Try the demo" login, which creates a throwaway sandbox
+# account seeded with sample applications (no Google sign-in required). Handy for
+# a shareable demo link where Gmail-scope OAuth verification isn't available.
+DEMO_MODE_ENABLED = _bool("DEMO_MODE_ENABLED", True)
+

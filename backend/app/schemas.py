@@ -92,3 +92,11 @@ class User(BaseModel):
     email: str
     name: str | None = None
     picture: str | None = None
+    is_demo: bool = False
+
+
+class ExtensionToken(BaseModel):
+    """A bearer token the browser extension uses to call the API."""
+
+    token: str
+    expires_at: datetime

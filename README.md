@@ -9,7 +9,7 @@ OfferFlow lets you capture applications, move them through a visual hiring pipel
 &nbsp;![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
 &nbsp;![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 &nbsp;![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
-&nbsp;![Tests](https://img.shields.io/badge/tests-49%20passing-brightgreen)
+&nbsp;![Tests](https://img.shields.io/badge/tests-62%20passing-brightgreen)
 
 ---
 
@@ -24,14 +24,16 @@ _A short demo GIF lives here once recorded (`docs/demo.gif`)._ In the meantime, 
 ## Highlights
 
 - **Google OAuth + server-side sessions** — sign in with Google; sessions are opaque, httpOnly-cookie backed, and stored server-side (no JWT-in-localStorage foot-guns).
+- **One-click demo login** — a public “Try the live demo” button spins up a throwaway sandbox account seeded with realistic sample applications, so anyone can explore the full app without Google sign-in.
 - **Two ways to view your pipeline** — a **drag-and-drop Kanban board** (powered by dnd-kit) and a **sortable, searchable, filterable table**, kept in sync.
 - **Activity timeline** — every status change is recorded as an immutable event and rendered as a per-application history in a slide-out detail drawer.
 - **Follow-up reminders** — set a next-action date and get colour-coded urgency pills (overdue / due soon / later) that automatically hide once an application is closed.
 - **Gmail import** — reads your recent mail, heuristically classifies job-related messages, guesses the company/status, and imports them as applications (deduped by Gmail thread).
+- **Browser extension** — a Manifest V3 extension that scrapes the company/position from LinkedIn, Greenhouse, Lever, Ashby, Workday and Indeed and saves the job in one click, authenticated with a revocable bearer pairing token.
 - **Dashboard metrics** — live counts by status so you can see the shape of your funnel at a glance.
 - **Command palette** — `Ctrl/Cmd-K` to jump around and act fast (cmdk).
 - **Polished UX** — five selectable themes including dark modes, skeleton loading states, and toast notifications.
-- **Engineered like production** — Alembic migrations, 49 automated tests, GitHub Actions CI, and env-driven config ready for split-domain deployment.
+- **Engineered like production** — Alembic migrations, 62 automated tests, GitHub Actions CI, and env-driven config ready for split-domain deployment.
 
 ---
 
@@ -41,7 +43,7 @@ _A short demo GIF lives here once recorded (`docs/demo.gif`)._ In the meantime, 
 flowchart LR
     subgraph Client
         FE["React + TS SPA<br/>(Vite)"]
-        EXT["Browser Extension<br/>(planned)"]
+        EXT["Browser Extension<br/>(MV3, one-click save)"]
     end
 
     subgraph Server["FastAPI Backend"]
@@ -54,7 +56,7 @@ flowchart LR
     DB[("PostgreSQL")]
 
     FE -->|"REST (cookie auth)"| Server
-    EXT -.->|planned| Server
+    EXT -->|"REST (bearer token)"| Server
     AUTH <-->|OAuth 2.0| GOOG
     GMAIL -->|read messages| GOOG
     Server -->|SQLAlchemy 2.0| DB
@@ -73,8 +75,9 @@ flowchart LR
 | Auth           | Authlib (Google OAuth 2.0), server-side sessions via httpOnly cookie        |
 | Database       | PostgreSQL (production) - SQLite (local dev) - Alembic migrations           |
 | Integrations   | Gmail API (google-api-python-client)                                        |
+| Extension      | Manifest V3 (Chrome/Edge), TypeScript, esbuild, bearer-token auth           |
 | Testing        | pytest + httpx (backend) - Vitest + React Testing Library (frontend)        |
-| CI / Infra     | GitHub Actions - Render blueprint (`render.yaml`) - Vercel-ready frontend   |
+| CI / Infra     | GitHub Actions - Render Blueprint (`render.yaml`: API + Postgres + static frontend) |
 
 ---
 
@@ -152,7 +155,7 @@ Interactive OpenAPI docs are available at `/docs` when the server is running.
 
 - **Typed end to end** — SQLAlchemy 2.0 `Mapped[...]` models, Pydantic v2 schemas, and strict-mode TypeScript.
 - **Migrations, not `create_all`** — every schema change is a reviewed Alembic revision; the production start command runs `alembic upgrade head` before serving.
-- **Tested** — 36 backend tests (isolated in-memory SQLite per test with dependency-overridden auth) and 13 frontend tests (pure logic + component behaviour).
+- **Tested** — 45 backend tests (isolated in-memory SQLite per test with dependency-overridden auth), 13 frontend tests (pure logic + component behaviour), and 4 extension scraper tests.
 - **CI on every push/PR** — GitHub Actions runs `pytest` and the frontend test + build in parallel.
 - **Security-minded** — httpOnly, `SameSite`/`Secure`-configurable session cookies; per-user data scoping on every query; secrets kept out of source via env vars.
 - **Deployment-ready** — env-driven CORS origins and cross-site cookie flags, proxy-aware startup, and a one-file Render blueprint.
@@ -211,13 +214,15 @@ cd frontend && npm test
 
 ## Deployment
 
-The repo is wired for a split-domain deploy (frontend and API on different hosts):
+The repo is wired for a split-domain deploy (frontend and API on different hosts), all in **one Render Blueprint** ([`render.yaml`](render.yaml)):
 
-- **Backend + Postgres:** [`render.yaml`](render.yaml) is a Render Blueprint that provisions a managed Postgres database and a web service, runs migrations on deploy, and serves the API behind TLS with proxy headers.
-- **Frontend:** deploy `frontend/` to Vercel and set `VITE_API_URL` to the API URL.
+- **Backend + Postgres:** provisions a managed Postgres database and a Python web service, runs Alembic migrations on deploy, and serves the API behind TLS with proxy headers.
+- **Frontend:** builds `frontend/` as a Render static site with a SPA rewrite; set `VITE_API_URL` to the API URL.
 - **Cross-site auth:** in production set `COOKIE_SAMESITE=none`, `COOKIE_SECURE=true`, and `ALLOWED_ORIGINS` to the deployed frontend URL so the session cookie flows across domains.
 
-> Note: because OfferFlow uses Google's Gmail (sensitive) scope, a fully public demo where anyone signs in requires Google's OAuth app verification. A demo GIF (or a seeded demo-login mode) is the low-friction way to showcase it.
+After the first deploy, fill each service's URL into the other's env vars (`VITE_API_URL`, `FRONTEND_URL`, `ALLOWED_ORIGINS`) and register `<API_URL>/auth/callback` as an authorized redirect URI in Google Cloud.
+
+> Note: because OfferFlow uses Google's Gmail (sensitive) scope, a fully public demo where anyone signs in with Google requires OAuth app verification. To keep a shareable link friction-free, the app ships a **“Try the live demo” login** (`DEMO_MODE_ENABLED`) that drops visitors into a throwaway sandbox account pre-seeded with sample applications — no Google sign-in required.
 
 ---
 

@@ -1,6 +1,13 @@
-# Render Blueprint for the OfferFlow backend + managed Postgres.
+# Render Blueprint for the OfferFlow backend + managed Postgres + static frontend.
 # Deploy by connecting this repo at https://dashboard.render.com/blueprints
 # and filling in the secret env vars marked "sync: false".
+#
+# After the first deploy Render assigns each service a URL. Then set, in the
+# dashboard:
+#   offerflow-api:      FRONTEND_URL + ALLOWED_ORIGINS = the frontend's URL
+#                       GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
+#   offerflow-frontend: VITE_API_URL = the API's URL (e.g. https://offerflow-api.onrender.com)
+# and add "<API_URL>/auth/callback" as an authorized redirect URI in Google Cloud.
 
 databases:
   - name: offerflow-db
@@ -33,12 +40,34 @@ services:
         value: none
       - key: COOKIE_SECURE
         value: "true"
+      # Public "Try the demo" login (seeded sandbox accounts, no Google sign-in).
+      - key: DEMO_MODE_ENABLED
+        value: "true"
       # Fill these in the Render dashboard (kept out of source control):
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+      # Set both to the offerflow-frontend URL once it's assigned, e.g.
+      # https://offerflow-frontend.onrender.com
       - key: FRONTEND_URL
         sync: false
       - key: ALLOWED_ORIGINS
         sync: false
+
+  - type: web
+    name: offerflow-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      # Build-time API base URL. Set to the offerflow-api URL once assigned, e.g.
+      # https://offerflow-api.onrender.com
+      - key: VITE_API_URL
+        sync: false
+    # SPA fallback so refreshing any path serves index.html.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

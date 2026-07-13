@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
-from app import auth, config, schemas
+from app import auth, config, demo, schemas
 from app.database import get_db
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -74,7 +74,42 @@ def logout(request: Request, db: Session = Depends(get_db)):
     return response
 
 
+@router.post("/demo", response_model=schemas.User)
+def demo_login(response: Response, db: Session = Depends(get_db)):
+    """Create a throwaway demo account, seed it, and set a session cookie."""
+    if not config.DEMO_MODE_ENABLED:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Demo mode is disabled"
+        )
+    user = demo.create_demo_user(db)
+    session = auth.create_session(db, user)
+    response.set_cookie(
+        key=config.SESSION_COOKIE_NAME,
+        value=session.token,
+        httponly=True,
+        samesite=config.COOKIE_SAMESITE,
+        secure=config.COOKIE_SECURE,
+        max_age=config.SESSION_TTL_DAYS * 24 * 60 * 60,
+        path="/",
+    )
+    return user
+
+
 @router.get("/me", response_model=schemas.User)
 def me(current_user=Depends(auth.get_current_user)):
     """Return the currently logged-in user."""
     return current_user
+
+
+@router.post("/extension-token", response_model=schemas.ExtensionToken)
+def create_extension_token(
+    db: Session = Depends(get_db),
+    current_user=Depends(auth.get_current_user),
+):
+    """Mint a new session token for the browser extension to use as a bearer.
+
+    This is a distinct session from the web login, so revoking or expiring the
+    extension token never signs the user out of the web app (and vice versa).
+    """
+    session = auth.create_session(db, current_user)
+    return schemas.ExtensionToken(token=session.token, expires_at=session.expires_at)

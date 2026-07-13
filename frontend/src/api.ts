@@ -29,11 +29,32 @@ export async function getCurrentUser(): Promise<User | null> {
   return handle<User>(res);
 }
 
+export async function startDemo(): Promise<User> {
+  return handle(
+    await fetch(`${BASE_URL}/auth/demo`, {
+      method: "POST",
+      ...withCredentials,
+    })
+  );
+}
+
 export async function logout(): Promise<void> {
   await fetch(`${BASE_URL}/auth/logout`, {
     method: "POST",
     ...withCredentials,
   });
+}
+
+export async function createExtensionToken(): Promise<{
+  token: string;
+  expires_at: string;
+}> {
+  return handle(
+    await fetch(`${BASE_URL}/auth/extension-token`, {
+      method: "POST",
+      ...withCredentials,
+    })
+  );
 }
 
 export async function listApplications(): Promise<Application[]> {
