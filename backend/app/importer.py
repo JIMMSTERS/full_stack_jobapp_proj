@@ -7,7 +7,7 @@ new applications and updating existing ones (deduped by Gmail thread).
 
 from sqlalchemy.orm import Session
 
-from app import classifier, crud, gmail, models
+from app import classifier, crud, gmail, llm, models
 
 DEFAULT_POSITION = "Unknown role"
 
@@ -28,7 +28,7 @@ def summarize_threads(messages: list[dict]) -> list[dict]:
     """
     threads: dict[str, list[dict]] = {}
     for message in messages:
-        result = classifier.classify(
+        result = llm.smart_classify(
             subject=message.get("subject", ""),
             sender=message.get("from", ""),
             snippet=message.get("snippet", ""),

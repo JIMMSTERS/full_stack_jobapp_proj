@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app import classifier, gmail, importer, models, schemas
+from app import gmail, importer, llm, models, schemas
 from app.auth import get_current_user
 from app.database import get_db
 
@@ -31,7 +31,7 @@ def list_messages(
         )
 
     for message in messages:
-        message["classification"] = classifier.classify(
+        message["classification"] = llm.smart_classify(
             subject=message.get("subject", ""),
             sender=message.get("from", ""),
             snippet=message.get("snippet", ""),

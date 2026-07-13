@@ -49,3 +49,13 @@ COOKIE_SECURE = _bool("COOKIE_SECURE", False)
 # a shareable demo link where Gmail-scope OAuth verification isn't available.
 DEMO_MODE_ENABLED = _bool("DEMO_MODE_ENABLED", True)
 
+# LLM email classifier (Anthropic). When enabled AND an API key is present, the
+# classifier uses an LLM for structured extraction and falls back to the
+# deterministic keyword heuristic on any error. Disabled by default so the app
+# runs with zero external calls / cost out of the box.
+LLM_CLASSIFIER_ENABLED = _bool("LLM_CLASSIFIER_ENABLED", False)
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+LLM_MODEL = os.getenv("LLM_MODEL", "claude-3-5-haiku-latest")
+LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "12"))
+
+

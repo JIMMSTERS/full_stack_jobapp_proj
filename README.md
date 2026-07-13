@@ -13,7 +13,7 @@ Sign in with Google, or click **“Try the live demo”** to jump into a pre-see
 &nbsp;![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
 &nbsp;![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 &nbsp;![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
-&nbsp;![Tests](https://img.shields.io/badge/tests-65%20passing-brightgreen)
+&nbsp;![Tests](https://img.shields.io/badge/tests-75%20passing-brightgreen)
 
 ---
 
@@ -34,12 +34,13 @@ _A short demo GIF lives here once recorded (`docs/demo.gif`)._
 - **Two ways to view your pipeline** — a **drag-and-drop Kanban board** (powered by dnd-kit) and a **sortable, searchable, filterable table**, kept in sync.
 - **Activity timeline** — every status change is recorded as an immutable event and rendered as a per-application history in a slide-out detail drawer.
 - **Follow-up reminders** — set a next-action date and get colour-coded urgency pills (overdue / due soon / later) that automatically hide once an application is closed.
-- **Gmail import** — reads your recent mail, heuristically classifies job-related messages, guesses the company/status, and imports them as applications (deduped by Gmail thread).
+- **Gmail import** — reads your recent mail, classifies job-related messages, guesses the company/status, and imports them as applications (deduped by Gmail thread).
+- **LLM classifier with an eval harness** — email classification runs through an LLM (Anthropic, structured tool-call output) with the deterministic keyword heuristic as an automatic fallback; a checked-in labeled dataset + `eval/` script measure accuracy so the two approaches can be compared quantitatively.
 - **Browser extension** — a Manifest V3 extension that scrapes the company/position from LinkedIn, Greenhouse, Lever, Ashby, Workday and Indeed and saves the job in one click, authenticated with a revocable bearer pairing token.
 - **Dashboard metrics** — live counts by status so you can see the shape of your funnel at a glance.
 - **Command palette** — `Ctrl/Cmd-K` to jump around and act fast (cmdk).
 - **Polished UX** — five selectable themes including dark modes, skeleton loading states, and toast notifications.
-- **Engineered like production** — Alembic migrations, 65 automated tests, GitHub Actions CI, and env-driven config ready for split-domain deployment.
+- **Engineered like production** — Alembic migrations, 75 automated tests, GitHub Actions CI, and env-driven config ready for split-domain deployment.
 
 ---
 
@@ -81,6 +82,7 @@ flowchart LR
 | Auth           | Authlib (Google OAuth 2.0), server-side sessions via httpOnly cookie        |
 | Database       | PostgreSQL (production) - SQLite (local dev) - Alembic migrations           |
 | Integrations   | Gmail API (google-api-python-client)                                        |
+| AI             | Anthropic Messages API (structured tool-call classification) + eval harness |
 | Extension      | Manifest V3 (Chrome/Edge), TypeScript, esbuild, bearer-token auth           |
 | Testing        | pytest + httpx (backend) - Vitest + React Testing Library (frontend)        |
 | CI / Infra     | GitHub Actions - Render Blueprint (`render.yaml`: API + Postgres + static frontend) |
@@ -157,11 +159,38 @@ Interactive OpenAPI docs are available at `/docs` when the server is running.
 
 ---
 
+## AI Email Classification & Evaluation
+
+Incoming emails are classified (job-related? which stage? which company?) by a
+two-tier classifier:
+
+1. **LLM tier** — calls Anthropic's Messages API with a forced **tool-call schema**, so the model returns strict, validated JSON instead of free text. Enabled via `LLM_CLASSIFIER_ENABLED` + `ANTHROPIC_API_KEY`.
+2. **Heuristic fallback** — a deterministic keyword/sender-rule classifier that runs when the LLM is disabled, unconfigured, or errors, so the feature degrades gracefully and never hard-depends on an external service.
+
+Rather than eyeball quality, the repo ships an **evaluation harness** ([`backend/eval/`](backend/eval)) with a hand-labeled dataset ([`dataset.jsonl`](backend/eval/dataset.jsonl), 36 examples) and a scorer:
+
+```bash
+python -m eval.evaluate            # heuristic baseline
+python -m eval.evaluate --model llm --  # LLM (needs ANTHROPIC_API_KEY)
+python -m eval.evaluate --model both    # side-by-side comparison
+```
+
+The heuristic baseline (measured, and guarded by a CI test so regressions fail the build):
+
+| Metric | is_job_related | status |
+| --- | --- | --- |
+| Accuracy | 0.86 | 0.92 |
+| Precision / Recall / F1 | 0.83 / 1.00 / 0.91 | — |
+
+The heuristic has perfect recall but over-triggers on recruiting-marketing and job-alert emails (lower precision) — exactly the ambiguity the LLM tier is designed to resolve.
+
+---
+
 ## Engineering Practices
 
 - **Typed end to end** — SQLAlchemy 2.0 `Mapped[...]` models, Pydantic v2 schemas, and strict-mode TypeScript.
 - **Migrations, not `create_all`** — every schema change is a reviewed Alembic revision; the production start command runs `alembic upgrade head` before serving.
-- **Tested** — 48 backend tests (isolated in-memory SQLite per test with dependency-overridden auth), 13 frontend tests (pure logic + component behaviour), and 4 extension scraper tests.
+- **Tested** — 58 backend tests (isolated in-memory SQLite per test with dependency-overridden auth), 13 frontend tests (pure logic + component behaviour), and 4 extension scraper tests.
 - **CI on every push/PR** — GitHub Actions runs `pytest` and the frontend test + build in parallel.
 - **Security-minded** — httpOnly, `SameSite`/`Secure`-configurable session cookies; per-user data scoping on every query; secrets kept out of source via env vars.
 - **Deployment-ready** — env-driven CORS origins and cross-site cookie flags, proxy-aware startup, and a one-file Render blueprint.
