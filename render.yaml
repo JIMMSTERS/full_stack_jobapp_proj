@@ -66,6 +66,10 @@ services:
       # https://offerflow-api.onrender.com
       - key: VITE_API_URL
         sync: false
+      # Gmail import uses Google's restricted gmail.readonly scope, which is
+      # blocked for unverified apps in production. Hide it in the public build.
+      - key: VITE_GMAIL_ENABLED
+        value: "false"
     # SPA fallback so refreshing any path serves index.html.
     routes:
       - type: rewrite

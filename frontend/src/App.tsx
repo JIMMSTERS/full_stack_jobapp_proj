@@ -28,6 +28,11 @@ import {
 
 type View = "table" | "board";
 
+// Gmail import uses Google's restricted gmail.readonly scope, which is blocked
+// for unverified apps in production. Disable it in deployed builds by setting
+// VITE_GMAIL_ENABLED="false"; it stays on for local development by default.
+const GMAIL_ENABLED = import.meta.env.VITE_GMAIL_ENABLED !== "false";
+
 type ThemeId = "light" | "dark" | "midnight" | "sepia" | "forest";
 
 const THEMES: { id: ThemeId; label: string; swatch: string }[] = [
@@ -339,7 +344,9 @@ export default function App() {
         />
       )}
 
-      <GmailPanel onImported={refresh} connected={user.gmail_connected ?? false} />
+      {GMAIL_ENABLED && (
+        <GmailPanel onImported={refresh} connected={user.gmail_connected ?? false} />
+      )}
 
       <ConnectExtension />
 
