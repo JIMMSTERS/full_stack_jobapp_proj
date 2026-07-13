@@ -4,6 +4,10 @@
 
 OfferFlow lets you capture applications, move them through a visual hiring pipeline, track every status change on a timeline, get colour-coded follow-up reminders, and even auto-import applications from your Gmail — all behind Google sign-in.
 
+### 🔗 [Live demo → offerflow-frontend.onrender.com](https://offerflow-frontend.onrender.com)
+
+Sign in with Google, or click **“Try the live demo”** to jump into a pre-seeded sandbox account — no account needed. _(Hosted on Render's free tier, so the first load may take ~30s to wake up.)_
+
 [![CI](https://github.com/JIMMSTERS/full_stack_jobapp_proj/actions/workflows/ci.yml/badge.svg)](https://github.com/JIMMSTERS/full_stack_jobapp_proj/actions/workflows/ci.yml)
 &nbsp;![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 &nbsp;![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
@@ -15,9 +19,11 @@ OfferFlow lets you capture applications, move them through a visual hiring pipel
 
 ## Demo
 
+**▶️ Try it live: https://offerflow-frontend.onrender.com** — use **“Try the live demo”** for instant access, no sign-in required.
+
 <!-- Record a ~60s screen capture (login -> add application -> drag across Kanban -> open detail drawer -> toggle dark theme) and save it as docs/demo.gif to embed it here. -->
 
-_A short demo GIF lives here once recorded (`docs/demo.gif`)._ In the meantime, [Local development](#local-development) gets you running in a couple of minutes.
+_A short demo GIF lives here once recorded (`docs/demo.gif`)._
 
 ---
 
