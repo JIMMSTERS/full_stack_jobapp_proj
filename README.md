@@ -9,7 +9,7 @@ OfferFlow lets you capture applications, move them through a visual hiring pipel
 &nbsp;![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
 &nbsp;![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 &nbsp;![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
-&nbsp;![Tests](https://img.shields.io/badge/tests-62%20passing-brightgreen)
+&nbsp;![Tests](https://img.shields.io/badge/tests-65%20passing-brightgreen)
 
 ---
 
@@ -33,7 +33,7 @@ _A short demo GIF lives here once recorded (`docs/demo.gif`)._ In the meantime, 
 - **Dashboard metrics** — live counts by status so you can see the shape of your funnel at a glance.
 - **Command palette** — `Ctrl/Cmd-K` to jump around and act fast (cmdk).
 - **Polished UX** — five selectable themes including dark modes, skeleton loading states, and toast notifications.
-- **Engineered like production** — Alembic migrations, 62 automated tests, GitHub Actions CI, and env-driven config ready for split-domain deployment.
+- **Engineered like production** — Alembic migrations, 65 automated tests, GitHub Actions CI, and env-driven config ready for split-domain deployment.
 
 ---
 
@@ -155,7 +155,7 @@ Interactive OpenAPI docs are available at `/docs` when the server is running.
 
 - **Typed end to end** — SQLAlchemy 2.0 `Mapped[...]` models, Pydantic v2 schemas, and strict-mode TypeScript.
 - **Migrations, not `create_all`** — every schema change is a reviewed Alembic revision; the production start command runs `alembic upgrade head` before serving.
-- **Tested** — 45 backend tests (isolated in-memory SQLite per test with dependency-overridden auth), 13 frontend tests (pure logic + component behaviour), and 4 extension scraper tests.
+- **Tested** — 48 backend tests (isolated in-memory SQLite per test with dependency-overridden auth), 13 frontend tests (pure logic + component behaviour), and 4 extension scraper tests.
 - **CI on every push/PR** — GitHub Actions runs `pytest` and the frontend test + build in parallel.
 - **Security-minded** — httpOnly, `SameSite`/`Secure`-configurable session cookies; per-user data scoping on every query; secrets kept out of source via env vars.
 - **Deployment-ready** — env-driven CORS origins and cross-site cookie flags, proxy-aware startup, and a one-file Render blueprint.
@@ -222,7 +222,7 @@ The repo is wired for a split-domain deploy (frontend and API on different hosts
 
 After the first deploy, fill each service's URL into the other's env vars (`VITE_API_URL`, `FRONTEND_URL`, `ALLOWED_ORIGINS`) and register `<API_URL>/auth/callback` as an authorized redirect URI in Google Cloud.
 
-> Note: because OfferFlow uses Google's Gmail (sensitive) scope, a fully public demo where anyone signs in with Google requires OAuth app verification. To keep a shareable link friction-free, the app ships a **“Try the live demo” login** (`DEMO_MODE_ENABLED`) that drops visitors into a throwaway sandbox account pre-seeded with sample applications — no Google sign-in required.
+> Note: sign-in requests only non-sensitive identity scopes (`openid email profile`), so once the OAuth app is published to production **any Google user can sign in** without verification. Gmail import is a separate, opt-in authorization that requests the sensitive `gmail.readonly` scope via incremental consent — that step stays limited to Google test users until the app passes verification. To keep a shareable link friction-free, the app also ships a **“Try the live demo” login** (`DEMO_MODE_ENABLED`) that drops visitors into a throwaway sandbox account pre-seeded with sample applications — no Google sign-in required.
 
 ---
 

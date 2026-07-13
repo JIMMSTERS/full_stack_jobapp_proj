@@ -33,7 +33,7 @@ def _credentials_for(db: Session, user: models.User) -> Credentials:
         token_uri=TOKEN_URI,
         client_id=config.GOOGLE_CLIENT_ID,
         client_secret=config.GOOGLE_CLIENT_SECRET,
-        scopes=auth.GOOGLE_SCOPES.split(),
+        scopes=auth.GMAIL_SCOPES.split(),
     )
 
     if not creds.valid:

@@ -339,7 +339,7 @@ export default function App() {
         />
       )}
 
-      <GmailPanel onImported={refresh} />
+      <GmailPanel onImported={refresh} connected={user.gmail_connected ?? false} />
 
       <ConnectExtension />
 

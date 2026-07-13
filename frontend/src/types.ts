@@ -40,6 +40,7 @@ export interface User {
   name: string | null;
   picture: string | null;
   is_demo?: boolean;
+  gmail_connected?: boolean;
 }
 
 export interface EmailClassification {

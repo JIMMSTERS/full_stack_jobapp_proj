@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { fetchGmailMessages, importFromGmail } from "../api";
+import { fetchGmailMessages, gmailConnectUrl, importFromGmail } from "../api";
 import type { GmailMessage, ImportSummary } from "../types";
 
 function formatDate(raw: string): string {
@@ -18,7 +18,13 @@ function formatDate(raw: string): string {
   });
 }
 
-export function GmailPanel({ onImported }: { onImported?: () => void }) {
+export function GmailPanel({
+  onImported,
+  connected = true,
+}: {
+  onImported?: () => void;
+  connected?: boolean;
+}) {
   const [messages, setMessages] = useState<GmailMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +70,26 @@ export function GmailPanel({ onImported }: { onImported?: () => void }) {
   const visible = jobsOnly
     ? messages.filter((m) => m.classification.is_job_related)
     : messages;
+
+  if (!connected) {
+    return (
+      <section className="gmail-panel">
+        <div className="gmail-header">
+          <h2>Gmail import</h2>
+        </div>
+        <div className="gmail-connect">
+          <p>
+            Connect your Gmail to auto-detect job applications from your inbox and
+            import them as tracked applications. Read-only access; you can revoke
+            it anytime from your Google account.
+          </p>
+          <a className="gmail-connect-btn" href={gmailConnectUrl}>
+            Connect Gmail
+          </a>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="gmail-panel">

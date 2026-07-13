@@ -42,6 +42,11 @@ class User(Base):
         """True for throwaway public-demo accounts (``demo-*`` subjects)."""
         return self.google_sub.startswith("demo-")
 
+    @property
+    def gmail_connected(self) -> bool:
+        """True once the user has completed the opt-in Gmail authorization."""
+        return bool(self.google_refresh_token)
+
 
 class Session(Base):
     """A server-side login session identified by an opaque cookie token."""

@@ -23,6 +23,9 @@ async function handle<T>(res: Response): Promise<T> {
 
 export const loginUrl = `${BASE_URL}/auth/login`;
 
+// Opt-in Gmail authorization (requests the sensitive gmail.readonly scope).
+export const gmailConnectUrl = `${BASE_URL}/auth/gmail/connect`;
+
 export async function getCurrentUser(): Promise<User | null> {
   const res = await fetch(`${BASE_URL}/auth/me`, withCredentials);
   if (res.status === 401) return null;

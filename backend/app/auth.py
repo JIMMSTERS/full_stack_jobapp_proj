@@ -10,17 +10,30 @@ from sqlalchemy.orm import Session
 from app import config, models
 from app.database import get_db
 
-# OAuth scopes we request. gmail.readonly lets us read (not modify) the inbox.
-GOOGLE_SCOPES = "openid email profile https://www.googleapis.com/auth/gmail.readonly"
+# OAuth scopes. Login only needs identity (all non-sensitive), so the app can be
+# published to production and ANY Google user can sign in without verification.
+# Gmail access is a separate, opt-in flow that requests the sensitive
+# gmail.readonly scope via incremental consent.
+LOGIN_SCOPES = "openid email profile"
+GMAIL_SCOPES = "openid email profile https://www.googleapis.com/auth/gmail.readonly"
 
 # Authlib OAuth registry. Google's discovery document supplies all endpoints.
+# Two clients share the same credentials but request different scopes: one for
+# plain sign-in, one for the opt-in Gmail connection.
 oauth = OAuth()
 oauth.register(
     name="google",
     client_id=config.GOOGLE_CLIENT_ID,
     client_secret=config.GOOGLE_CLIENT_SECRET,
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-    client_kwargs={"scope": GOOGLE_SCOPES},
+    client_kwargs={"scope": LOGIN_SCOPES},
+)
+oauth.register(
+    name="google_gmail",
+    client_id=config.GOOGLE_CLIENT_ID,
+    client_secret=config.GOOGLE_CLIENT_SECRET,
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": GMAIL_SCOPES},
 )
 
 

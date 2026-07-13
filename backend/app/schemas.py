@@ -93,6 +93,7 @@ class User(BaseModel):
     name: str | None = None
     picture: str | None = None
     is_demo: bool = False
+    gmail_connected: bool = False
 
 
 class ExtensionToken(BaseModel):

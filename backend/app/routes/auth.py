@@ -16,13 +16,13 @@ CALLBACK_PATH = "/auth/callback"
 
 @router.get("/login")
 async def login(request: Request):
-    """Start the OAuth flow by redirecting the user to Google."""
+    """Start the OAuth flow by redirecting the user to Google.
+
+    Requests identity scopes only (non-sensitive), so any Google user can sign
+    in without app verification. Gmail access is a separate opt-in step.
+    """
     redirect_uri = str(request.url_for("auth_callback"))
-    # access_type=offline + prompt=consent ensure Google returns a refresh token
-    # so we can read Gmail later without the user being present.
-    return await auth.oauth.google.authorize_redirect(
-        request, redirect_uri, access_type="offline", prompt="consent"
-    )
+    return await auth.oauth.google.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/callback", name="auth_callback")
@@ -41,8 +41,9 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED, detail="No user info returned"
         )
 
+    # Login establishes identity only; Gmail tokens are managed by the separate
+    # /auth/gmail/connect flow so a plain sign-in never touches Gmail access.
     user = auth.upsert_user(db, claims)
-    auth.save_google_tokens(db, user, token)
     session = auth.create_session(db, user)
 
     response = RedirectResponse(url=config.FRONTEND_URL)
@@ -56,6 +57,42 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
         path="/",
     )
     return response
+
+
+@router.get("/gmail/connect", name="gmail_connect")
+async def gmail_connect(
+    request: Request, current_user=Depends(auth.get_current_user)
+):
+    """Start the opt-in Gmail authorization for the logged-in user.
+
+    Requests the sensitive gmail.readonly scope via incremental consent.
+    access_type=offline + prompt=consent ensure Google returns a refresh token.
+    """
+    redirect_uri = str(request.url_for("gmail_callback"))
+    return await auth.oauth.google_gmail.authorize_redirect(
+        request,
+        redirect_uri,
+        access_type="offline",
+        prompt="consent",
+        include_granted_scopes="true",
+    )
+
+
+@router.get("/gmail/callback", name="gmail_callback")
+async def gmail_callback(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user=Depends(auth.get_current_user),
+):
+    """Handle Google's Gmail-consent redirect: store the user's Gmail tokens."""
+    try:
+        token = await auth.oauth.google_gmail.authorize_access_token(request)
+    except OAuthError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="OAuth failed"
+        )
+    auth.save_google_tokens(db, current_user, token)
+    return RedirectResponse(url=config.FRONTEND_URL)
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
