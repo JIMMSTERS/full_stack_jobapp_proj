@@ -83,6 +83,23 @@ class ApplicationStats(BaseModel):
     weekly: list[WeeklyPoint]
 
 
+class FunnelStage(BaseModel):
+    """One milestone in the application conversion funnel."""
+
+    stage: str
+    reached: int
+    conversion: float
+
+
+class ApplicationAnalytics(BaseModel):
+    """Timeline-derived conversion funnel and response-time metrics."""
+
+    sample_size: int
+    funnel: list[FunnelStage]
+    median_days_to_response: float | None = None
+    median_days_to_offer: float | None = None
+
+
 class User(BaseModel):
     """A logged-in user as returned by the API."""
 

@@ -1,7 +1,8 @@
-import type { ApplicationStats } from "../types";
+import type { ApplicationAnalytics, ApplicationStats } from "../types";
 
 interface Props {
   stats: ApplicationStats | null;
+  analytics?: ApplicationAnalytics | null;
 }
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
@@ -14,6 +15,13 @@ const STATUS_META: Record<string, { label: string; color: string }> = {
 
 const STATUS_ORDER = ["applied", "screening", "interview", "offer", "rejected"];
 
+const FUNNEL_META: Record<string, { label: string; color: string }> = {
+  applied: { label: "Applied", color: "#2563eb" },
+  screening: { label: "Screening", color: "#0891b2" },
+  interview: { label: "Interview", color: "#7c3aed" },
+  offer: { label: "Offer", color: "#16a34a" },
+};
+
 function pct(value: number): string {
   return `${Math.round(value * 100)}%`;
 }
@@ -25,7 +33,7 @@ function formatWeek(iso: string): string {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export function Dashboard({ stats }: Props) {
+export function Dashboard({ stats, analytics }: Props) {
   if (!stats || stats.total === 0) {
     return null;
   }
@@ -127,7 +135,77 @@ export function Dashboard({ stats }: Props) {
           </div>
         </div>
       </div>
+
+      {analytics && analytics.sample_size > 0 && (
+        <Funnel analytics={analytics} />
+      )}
     </section>
+  );
+}
+
+function Funnel({ analytics }: { analytics: ApplicationAnalytics }) {
+  const top = analytics.funnel[0]?.reached || 1;
+  return (
+    <div className="dash-charts">
+      <div className="dash-chart card">
+        <h3>Conversion funnel</h3>
+        <div className="funnel">
+          {analytics.funnel.map((stage) => {
+            const meta = FUNNEL_META[stage.stage] ?? {
+              label: stage.stage,
+              color: "#64748b",
+            };
+            return (
+              <div className="funnel-row" key={stage.stage}>
+                <span className="funnel-label">{meta.label}</span>
+                <div className="funnel-track">
+                  <div
+                    className="funnel-fill"
+                    style={{
+                      width: `${(stage.reached / top) * 100}%`,
+                      background: meta.color,
+                    }}
+                  >
+                    <span className="funnel-count">{stage.reached}</span>
+                  </div>
+                </div>
+                <span className="funnel-pct">{pct(stage.conversion)}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="dash-chart card">
+        <h3>Response times</h3>
+        <div className="timing-list">
+          <Timing
+            label="Median time to first response"
+            days={analytics.median_days_to_response}
+          />
+          <Timing
+            label="Median time to offer"
+            days={analytics.median_days_to_offer}
+          />
+          <p className="timing-note">
+            Derived from the immutable status-change timeline across{" "}
+            {analytics.sample_size} application
+            {analytics.sample_size === 1 ? "" : "s"}.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Timing({ label, days }: { label: string; days: number | null }) {
+  return (
+    <div className="timing-row">
+      <span className="timing-value">
+        {days == null ? "—" : `${days} ${days === 1 ? "day" : "days"}`}
+      </span>
+      <span className="timing-label">{label}</span>
+    </div>
   );
 }
 

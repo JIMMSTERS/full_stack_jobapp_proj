@@ -736,6 +736,86 @@ button.link {
   white-space: nowrap;
 }
 
+/* ---------- Conversion funnel + response times ---------- */
+
+.funnel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.funnel-row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr 3rem;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.funnel-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.funnel-track {
+  background: var(--surface-2);
+  border-radius: 6px;
+  overflow: hidden;
+  height: 1.6rem;
+}
+
+.funnel-fill {
+  height: 100%;
+  min-width: 1.6rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: width 0.4s ease;
+}
+
+.funnel-count {
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding-right: 0.45rem;
+}
+
+.funnel-pct {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.timing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.timing-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.timing-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.timing-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.timing-note {
+  font-size: 0.74rem;
+  color: var(--text-subtle);
+  margin: 0.2rem 0 0;
+}
+
 @media (max-width: 760px) {
   .dash-kpis {
     grid-template-columns: repeat(2, 1fr);

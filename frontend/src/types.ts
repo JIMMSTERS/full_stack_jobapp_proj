@@ -82,6 +82,19 @@ export interface ApplicationStats {
   weekly: WeeklyPoint[];
 }
 
+export interface FunnelStage {
+  stage: string;
+  reached: number;
+  conversion: number;
+}
+
+export interface ApplicationAnalytics {
+  sample_size: number;
+  funnel: FunnelStage[];
+  median_days_to_response: number | null;
+  median_days_to_offer: number | null;
+}
+
 export const STATUSES = [
   "applied",
   "screening",

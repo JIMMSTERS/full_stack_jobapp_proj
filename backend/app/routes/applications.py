@@ -30,6 +30,15 @@ def application_stats(
     return crud.get_application_stats(db, current_user.id)
 
 
+@router.get("/analytics", response_model=schemas.ApplicationAnalytics)
+def application_analytics(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """Return the timeline-derived conversion funnel and response times."""
+    return crud.get_application_analytics(db, current_user.id)
+
+
 @router.post("", response_model=schemas.Application, status_code=status.HTTP_201_CREATED)
 def create_application(
     payload: schemas.ApplicationCreate,

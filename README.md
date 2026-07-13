@@ -2,7 +2,7 @@
 
 **A full-stack job & internship application tracker that turns a chaotic job search into an organized, actionable pipeline.**
 
-OfferFlow lets you capture applications, move them through a visual hiring pipeline, track every status change on a timeline, get colour-coded follow-up reminders, and even auto-import applications from your Gmail — all behind Google sign-in.
+OfferFlow lets you capture applications, move them through a visual hiring pipeline, track every status change on a timeline, get colour-coded follow-up reminders, and analyze your funnel with conversion and response-time metrics — all behind Google sign-in.
 
 ### 🔗 [Live demo → offerflow-frontend.onrender.com](https://offerflow-frontend.onrender.com)
 
@@ -13,7 +13,7 @@ Sign in with Google, or click **“Try the live demo”** to jump into a pre-see
 &nbsp;![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
 &nbsp;![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 &nbsp;![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
-&nbsp;![Tests](https://img.shields.io/badge/tests-75%20passing-brightgreen)
+&nbsp;![Tests](https://img.shields.io/badge/tests-78%20passing-brightgreen)
 
 ---
 
@@ -38,9 +38,10 @@ _A short demo GIF lives here once recorded (`docs/demo.gif`)._
 - **LLM classifier with an eval harness** — email classification runs through an LLM (Anthropic, structured tool-call output) with the deterministic keyword heuristic as an automatic fallback; a checked-in labeled dataset + `eval/` script measure accuracy so the two approaches can be compared quantitatively.
 - **Browser extension** — a Manifest V3 extension that scrapes the company/position from LinkedIn, Greenhouse, Lever, Ashby, Workday and Indeed and saves the job in one click, authenticated with a revocable bearer pairing token.
 - **Dashboard metrics** — live counts by status so you can see the shape of your funnel at a glance.
+- **Conversion funnel & response times** — a funnel (applied → interview → offer) and median time-to-response / time-to-offer, all derived from the immutable status-change timeline rather than stored redundantly.
 - **Command palette** — `Ctrl/Cmd-K` to jump around and act fast (cmdk).
 - **Polished UX** — five selectable themes including dark modes, skeleton loading states, and toast notifications.
-- **Engineered like production** — Alembic migrations, 75 automated tests, GitHub Actions CI, and env-driven config ready for split-domain deployment.
+- **Engineered like production** — Alembic migrations, 78 automated tests, GitHub Actions CI, and env-driven config ready for split-domain deployment.
 
 ---
 
@@ -148,6 +149,7 @@ All application and Gmail routes require an authenticated session cookie and are
 | `GET`    | `/applications`                   | List the user's applications                        |
 | `POST`   | `/applications`                   | Create an application                                |
 | `GET`    | `/applications/stats`             | Status counts for the dashboard                     |
+| `GET`    | `/applications/analytics`         | Conversion funnel + median response/offer times     |
 | `GET`    | `/applications/{id}`              | Fetch a single application                          |
 | `GET`    | `/applications/{id}/events`       | Activity timeline for an application                |
 | `PATCH`  | `/applications/{id}`              | Update fields / status (records a timeline event)   |
@@ -190,7 +192,7 @@ The heuristic has perfect recall but over-triggers on recruiting-marketing and j
 
 - **Typed end to end** — SQLAlchemy 2.0 `Mapped[...]` models, Pydantic v2 schemas, and strict-mode TypeScript.
 - **Migrations, not `create_all`** — every schema change is a reviewed Alembic revision; the production start command runs `alembic upgrade head` before serving.
-- **Tested** — 58 backend tests (isolated in-memory SQLite per test with dependency-overridden auth), 13 frontend tests (pure logic + component behaviour), and 4 extension scraper tests.
+- **Tested** — 61 backend tests (isolated in-memory SQLite per test with dependency-overridden auth), 13 frontend tests (pure logic + component behaviour), and 4 extension scraper tests.
 - **CI on every push/PR** — GitHub Actions runs `pytest` and the frontend test + build in parallel.
 - **Security-minded** — httpOnly, `SameSite`/`Secure`-configurable session cookies; per-user data scoping on every query; secrets kept out of source via env vars.
 - **Deployment-ready** — env-driven CORS origins and cross-site cookie flags, proxy-aware startup, and a one-file Render blueprint.

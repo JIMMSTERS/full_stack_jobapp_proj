@@ -3,6 +3,7 @@ import { Toaster, toast } from "sonner";
 import {
   createApplication,
   deleteApplication,
+  getApplicationAnalytics,
   getApplicationStats,
   getCurrentUser,
   listApplications,
@@ -11,7 +12,7 @@ import {
   startDemo,
   updateApplication,
 } from "./api";
-import type { Application, ApplicationCreate, ApplicationStats, User } from "./types";
+import type { Application, ApplicationCreate, ApplicationAnalytics, ApplicationStats, User } from "./types";
 import { ApplicationForm } from "./components/ApplicationForm";
 import { ApplicationTable } from "./components/ApplicationTable";
 import { CommandPalette } from "./components/CommandPalette";
@@ -59,6 +60,7 @@ export default function App() {
   const [authChecked, setAuthChecked] = useState(false);
   const [applications, setApplications] = useState<Application[]>([]);
   const [stats, setStats] = useState<ApplicationStats | null>(null);
+  const [analytics, setAnalytics] = useState<ApplicationAnalytics | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -73,12 +75,14 @@ export default function App() {
 
   async function refresh() {
     try {
-      const [apps, nextStats] = await Promise.all([
+      const [apps, nextStats, nextAnalytics] = await Promise.all([
         listApplications(),
         getApplicationStats(),
+        getApplicationAnalytics(),
       ]);
       setApplications(apps);
       setStats(nextStats);
+      setAnalytics(nextAnalytics);
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
@@ -118,6 +122,7 @@ export default function App() {
     } else {
       setApplications([]);
       setStats(null);
+      setAnalytics(null);
       setLoading(false);
     }
   }, [user]);
@@ -299,7 +304,7 @@ export default function App() {
 
       {error && <div className="error">{error}</div>}
 
-      {loading && !stats ? <DashboardSkeleton /> : <Dashboard stats={stats} />}
+      {loading && !stats ? <DashboardSkeleton /> : <Dashboard stats={stats} analytics={analytics} />}
 
       <ApplicationForm onCreate={handleCreate} />
 

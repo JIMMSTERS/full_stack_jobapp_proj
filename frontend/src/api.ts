@@ -1,6 +1,7 @@
 import type {
   Application,
   ApplicationCreate,
+  ApplicationAnalytics,
   ApplicationStats,
   GmailMessage,
   ImportSummary,
@@ -67,6 +68,12 @@ export async function listApplications(): Promise<Application[]> {
 export async function getApplicationStats(): Promise<ApplicationStats> {
   return handle(
     await fetch(`${BASE_URL}/applications/stats`, withCredentials)
+  );
+}
+
+export async function getApplicationAnalytics(): Promise<ApplicationAnalytics> {
+  return handle(
+    await fetch(`${BASE_URL}/applications/analytics`, withCredentials)
   );
 }
 

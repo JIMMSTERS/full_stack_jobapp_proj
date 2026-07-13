@@ -232,3 +232,84 @@ def get_application_stats(db: Session, user_id: int) -> dict:
         "offer_rate": rate(offers),
         "weekly": weekly,
     }
+
+
+# Pipeline milestones for the conversion funnel, in order. ``rejected`` is a
+# terminal off-pipeline state and is excluded from progression.
+FUNNEL_STAGES = ["applied", "screening", "interview", "offer"]
+_STAGE_RANK = {stage: rank for rank, stage in enumerate(FUNNEL_STAGES)}
+
+
+def _median(values: list[float]) -> float | None:
+    """Return the median of ``values`` rounded to 1 dp, or None if empty."""
+    if not values:
+        return None
+    ordered = sorted(values)
+    mid = len(ordered) // 2
+    if len(ordered) % 2:
+        median = ordered[mid]
+    else:
+        median = (ordered[mid - 1] + ordered[mid]) / 2
+    return round(median, 1)
+
+
+def get_application_analytics(db: Session, user_id: int) -> dict:
+    """Derive a conversion funnel and response-time metrics from the timeline.
+
+    Uses the immutable ``status_events`` history: for each application we take
+    the furthest pipeline stage it ever reached (ignoring rejections) to build a
+    monotonic funnel, and measure elapsed days from the first event to the first
+    response (any later event) and to an offer.
+    """
+    events = (
+        db.query(
+            models.StatusEvent.application_id,
+            models.StatusEvent.to_status,
+            models.StatusEvent.created_at,
+        )
+        .join(models.Application, models.Application.id == models.StatusEvent.application_id)
+        .filter(models.Application.user_id == user_id)
+        .order_by(models.StatusEvent.created_at, models.StatusEvent.id)
+        .all()
+    )
+
+    by_app: dict[int, list] = {}
+    for row in events:
+        by_app.setdefault(row.application_id, []).append(row)
+
+    total = len(by_app)
+    reached = {stage: 0 for stage in FUNNEL_STAGES}
+    days_to_response: list[float] = []
+    days_to_offer: list[float] = []
+
+    for app_events in by_app.values():
+        ranks = [_STAGE_RANK[e.to_status] for e in app_events if e.to_status in _STAGE_RANK]
+        furthest = max(ranks) if ranks else 0
+        for stage in FUNNEL_STAGES:
+            if furthest >= _STAGE_RANK[stage]:
+                reached[stage] += 1
+
+        first = _as_utc(app_events[0].created_at)
+        if len(app_events) > 1:
+            second = _as_utc(app_events[1].created_at)
+            days_to_response.append((second - first).total_seconds() / 86400)
+        offer_event = next((e for e in app_events if e.to_status == "offer"), None)
+        if offer_event is not None:
+            offer_at = _as_utc(offer_event.created_at)
+            days_to_offer.append((offer_at - first).total_seconds() / 86400)
+
+    funnel = [
+        {
+            "stage": stage,
+            "reached": reached[stage],
+            "conversion": round(reached[stage] / total, 4) if total else 0.0,
+        }
+        for stage in FUNNEL_STAGES
+    ]
+
+    return {
+        "sample_size": total,
+        "funnel": funnel,
+        "median_days_to_response": _median(days_to_response),
+        "median_days_to_offer": _median(days_to_offer),
+    }
